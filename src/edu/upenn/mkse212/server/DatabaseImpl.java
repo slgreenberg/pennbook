@@ -31,7 +31,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		String userID = "AKIAJQV2RJ5OZMECVPQA";
 		String authKey = "PAlrjITfdQ+RmNxGpqfV8MXOqxSEf8ZLSJoNwA4w";
 		db = new AmazonSimpleDBClient(new BasicAWSCredentials(userID, authKey));
-	}
+	} 
 	
 	public boolean validateLogin(String username, String password) {
 		GetAttributesResult result = db.getAttributes(

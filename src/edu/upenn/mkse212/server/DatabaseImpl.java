@@ -28,8 +28,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	private AmazonSimpleDBClient db;
 	
 	public DatabaseImpl() {
-		String userID = "*** your access key ID here ***";
-		String authKey = "*** your secret access key here ***";
+		String userID = "AKIAJQV2RJ5OZMECVPQA";
+		String authKey = "PAlrjITfdQ+RmNxGpqfV8MXOqxSEf8ZLSJoNwA4w";
 		db = new AmazonSimpleDBClient(new BasicAWSCredentials(userID, authKey));
 	}
 	

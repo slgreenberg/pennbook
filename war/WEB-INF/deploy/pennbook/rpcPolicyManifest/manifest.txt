@@ -1,2 +1,3 @@
 # Module pennbook
 # RPC service class, partial path of RPC policy file
+edu.upenn.mkse212.client.Database, 6E5CA6F167FDE7312B59FE775A67B6AB.gwt.rpc

@@ -9,6 +9,10 @@ public interface DatabaseAsync {
 			throws IllegalArgumentException;
 			void incrementLogins(String username, AsyncCallback<Integer> callback)
 			throws IllegalArgumentException;
+			void addUser(String username, String password, String firstName,
+					String lastName, String email, String network, String interests,
+					String birthday, AsyncCallback<Boolean> asyncCallback)
+			throws IllegalArgumentException;
 
 
 }

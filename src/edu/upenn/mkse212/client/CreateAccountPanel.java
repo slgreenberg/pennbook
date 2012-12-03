@@ -56,13 +56,13 @@ public class CreateAccountPanel {
 		RootPanel.get("rootPanelContainer").add(p);
 		usernameField.setFocus(true);
 		usernameField.selectAll();
-		/*
+
 		signupButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				final String username = usernameField.getText();
 				parent.getDatabaseService().addUser(
 					username, passwordField.getText(), firstnameField.getText(), lastnameField.getText(),
-					emailField.getText(), networkField.getText(), birthdayField.getText(),
+					emailField.getText(), networkField.getText(), interestField.getText(), birthdayField.getText(),
 						new AsyncCallback<Boolean>() {
 							public void onFailure(Throwable caught) {
 								parent.popupBox("RPC failure", "Cannot communicate with the server");
@@ -77,7 +77,6 @@ public class CreateAccountPanel {
 				});
 			}
 		});
-		*/
 	}
 	
 

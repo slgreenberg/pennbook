@@ -16,7 +16,6 @@ package edu.upenn.mkse212.server;
 
 import edu.upenn.mkse212.client.Database;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -76,8 +75,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//updates both the user's list of friends as well as the other user's
 	//list of friends
 	//and adds both to friends database
-	public boolean addFriend(String username, String otherUsername, Timestamp time) {
+	public boolean addFriend(String username, String otherUsername) {
 		//populates users' store of friends
+		long time = System.currentTimeMillis();
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributeList = result.getAttributes();
@@ -122,8 +122,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//add an update to the database if novel post
 	//else it just updates the associated text
-	public boolean addUpdate(String username, String otherUsername, 
-			 Timestamp time, String text) {
+	public boolean addUpdate(String username, String otherUsername,
+			String text) {
+		long time = System.currentTimeMillis();
 		String t = "";
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("updates", username));
@@ -150,7 +151,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//updated given code to match implemented databases
 	public boolean validateLogin(String username, String password) {
-		GetAttributesResult result = db.getAttributes(
+		/*GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("passwords", username));
 		List<Attribute> attributeList = result.getAttributes();
 		for (Attribute a : attributeList) {
@@ -158,7 +159,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				return new Boolean(a.getValue().equals(
 						String.valueOf(password.hashCode())));
 			}
-		}
+		}*/
 		return new Boolean(false);
 	}
 	

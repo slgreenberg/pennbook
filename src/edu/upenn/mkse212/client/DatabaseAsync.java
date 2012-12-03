@@ -1,7 +1,5 @@
 package edu.upenn.mkse212.client;
 
-import java.sql.Timestamp;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
@@ -15,10 +13,10 @@ public interface DatabaseAsync {
 		String lastName, String email, String network, String interests,
 		String birthday, AsyncCallback<Boolean> callback)
 		throws IllegalArgumentException;
-	//void addFriend(String username, String otherUsername, Timestamp time) 
+	/*void addFriend(String username, String otherUsername) 
 	//		throws IllegalArgumentException;
-	//void addUpdate(String username, String otherUsername, Timestamp time,
+	//void addUpdate(String username, String otherUsername,
 	//		String text) throws IllegalArgumentException;
-
+	*/
 
 }

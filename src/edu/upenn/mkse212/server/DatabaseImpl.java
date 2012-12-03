@@ -60,12 +60,13 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		list.add(new ReplaceableAttribute("birthday", ""+birthday,false));
 		String friends = "";
 		list.add(new ReplaceableAttribute("friends", ""+friends, true));
+		
 		db.putAttributes(new PutAttributesRequest("users", username, list, 
 				new UpdateCondition()));
 		
 		//puts hashed password into passwords database
 		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
-		list.add(new ReplaceableAttribute("password",
+		l.add(new ReplaceableAttribute("password",
 				""+String.valueOf(password.hashCode()),true));
 		db.putAttributes(new PutAttributesRequest("passwords", username, l,
 				new UpdateCondition()));

@@ -104,9 +104,14 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		db.putAttributes(new PutAttributesRequest("users", username, list, 
 				new UpdateCondition()));
 		return new Integer(loginsSoFar);
-		}
+	}
+	
+	public void addUser(String username, String password, String firstName,
+					String lastName, String email, String network, String birthday) {
+		
+	}
 
-
+	
 	
 
 

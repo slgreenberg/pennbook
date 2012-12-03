@@ -38,6 +38,7 @@ public class PennBook implements EntryPoint {
   private final DatabaseAsync databaseService = GWT.create(Database.class);
   private ProfilePanel wallPanel;
   private LoginPanel loginPanel;
+  private CreateAccountPanel createAccountPanel;
   private String handle;
   protected DatabaseAsync getDatabaseService() {
 	  return databaseService;
@@ -48,10 +49,14 @@ public class PennBook implements EntryPoint {
   protected LoginPanel getLoginPanel() {
 	  return loginPanel;
   }
+  protected CreateAccountPanel getCreateAccountPanel() {
+	  return createAccountPanel;
+  }
   
   public void onModuleLoad() {
 	  wallPanel = new ProfilePanel(this);
 	  loginPanel = new LoginPanel(this);
+	  createAccountPanel = new CreateAccountPanel(this);
 	  loginPanel.display();
   }
   

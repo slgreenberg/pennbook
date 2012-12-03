@@ -26,6 +26,7 @@ public class LoginPanel {
 		final TextBox usernameField = new TextBox();
 		final TextBox passwordField = new TextBox();
 		final Button loginButton = new Button("Login");
+		final Button signupButton = new Button("Don't have an account? Signup!");
 		AbsolutePanel p = new AbsolutePanel();
 		p.setWidth("500px");
 		p.setHeight("200px");
@@ -34,6 +35,7 @@ public class LoginPanel {
 		p.add(new Label("Password:"), 30, 85);
 		p.add(passwordField, 155, 80);
 		p.add(loginButton, 220, 130);
+		p.add(signupButton, 400, 140);
 		RootPanel.get("rootPanelContainer").clear();
 		RootPanel.get("rootPanelContainer").add(p);
 		usernameField.setFocus(true);
@@ -56,6 +58,13 @@ public class LoginPanel {
 				});
 			}
 		});
+		
+		signupButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				parent.getCreateAccountPanel().display();
+			}
+		});
+		
 	}
 	
 

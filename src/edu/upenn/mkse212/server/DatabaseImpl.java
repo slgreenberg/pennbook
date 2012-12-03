@@ -15,6 +15,8 @@
 package edu.upenn.mkse212.server;
 
 import edu.upenn.mkse212.client.Database;
+
+import java.sql.Timestamp;
 import java.util.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -51,10 +53,27 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			list.add(new ReplaceableAttribute("network", ""+network,false));
 			list.add(new ReplaceableAttribute("interests", ""+interests, false));
 			list.add(new ReplaceableAttribute("birthday", ""+birthday,false));
+			String friends = "";
+			list.add(new ReplaceableAttribute("friends", ""+friends, true));
 			db.putAttributes(new PutAttributesRequest("users", username, list, 
 					new UpdateCondition()));
 			return true;
 		}
+	}
+	
+	public boolean addFriend(String username, String otherUsername, Timestamp time) {
+		GetAttributesResult result = db.getAttributes(
+				new GetAttributesRequest("users", username));
+		List<Attribute> attributeList = result.getAttributes();
+		String friend = otherUsername;
+		for (Attribute a : attributeList) {
+			if (a.getName().equals("friends")) {
+				friend+="~"+a.getValue();
+				a.setValue(friend);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public boolean validateLogin(String username, String password) {

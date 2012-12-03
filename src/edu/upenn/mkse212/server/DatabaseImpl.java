@@ -44,10 +44,11 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		List<Attribute> attributesList = result.getAttributes();
 		for (Attribute a : attributesList) {
 			if (a.getName().equals(username)) {
-				return false;
+				return new Boolean(false);
 			}
 		}
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
+		//put password in own database w/ email
 		list.add(new ReplaceableAttribute("password", ""+password,false));
 		list.add(new ReplaceableAttribute("firstName", ""+firstName,false));
 		list.add(new ReplaceableAttribute("lastName", ""+lastName,false));
@@ -59,7 +60,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		list.add(new ReplaceableAttribute("friends", ""+friends, true));
 		db.putAttributes(new PutAttributesRequest("users", username, list, 
 				new UpdateCondition()));
-		return true;
+		return new Boolean(true);
 	}
 	
 	public boolean addFriend(String username, String otherUsername, Timestamp time) {
@@ -71,10 +72,31 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			if (a.getName().equals("friends")) {
 				friend+="~"+a.getValue();
 				a.setValue(friend);
-				return true;
+				return new Boolean(true);
 			}
 		}
-		return false;
+		return new Boolean(true);
+	}
+	
+	public boolean addUpdate(String username, String otherUsername, 
+			 Timestamp time, String text) {
+		String t = "";
+		GetAttributesResult result = db.getAttributes(
+				new GetAttributesRequest("updates", username));
+		List<Attribute> attributeList = result.getAttributes();
+		for (Attribute a : attributeList) {
+			if (a.getName().equals("text")) {
+				t+=a.getValue();
+			}
+		}
+		t+=text;
+		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
+		list.add(new ReplaceableAttribute("friend", ""+otherUsername, false));
+		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		list.add(new ReplaceableAttribute("text", ""+t,false));
+		db.putAttributes(new PutAttributesRequest("updates", username, list, 
+				new UpdateCondition()));
+		return new Boolean(true);
 	}
 	
 	public boolean validateLogin(String username, String password) {
@@ -107,10 +129,6 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Integer(loginsSoFar);
 	}
 	
-	public void addUser(String username, String password, String firstName,
-					String lastName, String email, String network, String birthday) {
-		
-	}
 
 	
 	

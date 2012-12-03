@@ -14,6 +14,8 @@
  *******************************************************************************/
 package edu.upenn.mkse212.client;
 
+import java.sql.Timestamp;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -38,6 +40,11 @@ public interface Database extends RemoteService {
 	boolean addUser(String username, String password, String firstName,
 					String LastName, String email, String network, 
 					String interests, String birthday);
+	
+	//boolean addFriend(String username, String otherUsername, Timestamp time);
+	
+	//boolean addUpdate(String username, String otherUsername, Timestamp time,
+	//	String text);
 
 	Integer incrementLogins(String username);
 }

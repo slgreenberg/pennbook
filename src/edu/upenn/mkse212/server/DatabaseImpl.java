@@ -75,7 +75,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//updates both the user's list of friends as well as the other user's
 	//list of friends
+	//and adds both to friends database
 	public boolean addFriend(String username, String otherUsername, Timestamp time) {
+		//populates users' store of friends
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributeList = result.getAttributes();
@@ -102,6 +104,19 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				check2 = true;
 			}
 		}
+		
+		//populates friends database
+		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
+		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
+		list.add(new ReplaceableAttribute("friend", ""+otherUsername,false));
+		l.add(new ReplaceableAttribute("friend", ""+username,false));
+		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		l.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		db.putAttributes(new PutAttributesRequest("friends", username, list,
+				new UpdateCondition()));
+		db.putAttributes(new PutAttributesRequest("friends", otherUsername, l,
+				new UpdateCondition()));
+		
 		return new Boolean(check1&&check2);
 	}
 	
@@ -131,14 +146,17 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Boolean(true);
 	}
 	
-	//given code
+	
+	
+	//updated given code to match implemented databases
 	public boolean validateLogin(String username, String password) {
 		GetAttributesResult result = db.getAttributes(
-				new GetAttributesRequest("users", username));
+				new GetAttributesRequest("passwords", username));
 		List<Attribute> attributeList = result.getAttributes();
 		for (Attribute a : attributeList) {
 			if (a.getName().equals("password")) {
-				return new Boolean(a.getValue().equals(password));
+				return new Boolean(a.getValue().equals(
+						String.valueOf(password.hashCode())));
 			}
 		}
 		return new Boolean(false);

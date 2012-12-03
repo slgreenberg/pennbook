@@ -152,14 +152,24 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//updated given code to match implemented databases
 	public boolean validateLogin(String username, String password) {
-		GetAttributesResult result = db.getAttributes(
-				//new GetAttributesRequest("passwords", username));
-				new GetAttributesRequest("users", username));
-		List<Attribute> attributeList = result.getAttributes();
-		for (Attribute a : attributeList) {
-			if (a.getName().equals("password")) {
-				return new Boolean(a.getValue().equals(password));
-						//String.valueOf(password.hashCode())));
+		if (username.equals("ahae") || username.equals("susangr")) {
+			GetAttributesResult result = db.getAttributes(
+					new GetAttributesRequest("users", username));
+			List<Attribute> attributeList = result.getAttributes();
+			for (Attribute a : attributeList) {
+				if (a.getName().equals("password")) {
+					return new Boolean(a.getValue().equals(password));
+				}
+			}
+		} else {
+			GetAttributesResult result = db.getAttributes(
+					new GetAttributesRequest("passwords", username));
+			List<Attribute> attributeList = result.getAttributes();
+			for (Attribute a : attributeList) {
+				if (a.getName().equals("password")) {
+					return new Boolean(a.getValue().equals(
+							String.valueOf(password.hashCode())));
+				}
 			}
 		}
 		return new Boolean(false);

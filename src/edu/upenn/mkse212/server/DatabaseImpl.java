@@ -16,6 +16,7 @@ package edu.upenn.mkse212.server;
 
 import edu.upenn.mkse212.client.Database;
 import java.util.*;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.amazonaws.services.simpledb.*;
 import com.amazonaws.services.simpledb.model.*;
@@ -34,16 +35,26 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	} 
 	
 	public boolean addUser(String username, String password, String firstName, 
-			String lastName, String email, String newtork, String birthday) {
+			String lastName, String email, String network, String interests,
+			String birthday) {
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributesList = result.getAttributes();
 		if (!attributesList.isEmpty()) {
 			return false;
 		} else {
-			
+			List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
+			list.add(new ReplaceableAttribute("password", ""+password,false));
+			list.add(new ReplaceableAttribute("firstName", ""+firstName,false));
+			list.add(new ReplaceableAttribute("lastName", ""+lastName,false));
+			list.add(new ReplaceableAttribute("email", ""+email,false));
+			list.add(new ReplaceableAttribute("network", ""+network,false));
+			list.add(new ReplaceableAttribute("interests", ""+interests, false));
+			list.add(new ReplaceableAttribute("birthday", ""+birthday,false));
+			db.putAttributes(new PutAttributesRequest("users", username, list, 
+					new UpdateCondition()));
+			return true;
 		}
-		return false;
 	}
 	
 	public boolean validateLogin(String username, String password) {
@@ -71,8 +82,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		loginsSoFar ++;
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 		list.add(new ReplaceableAttribute("loginsSoFar", ""+loginsSoFar, false));
-		db.putAttributes(new PutAttributesRequest("users", username, list,
-		new UpdateCondition()));
+		db.putAttributes(new PutAttributesRequest("users", username, list, 
+				new UpdateCondition()));
 		return new Integer(loginsSoFar);
 		}
 

@@ -36,20 +36,23 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		db = new AmazonSimpleDBClient(new BasicAWSCredentials(userID, authKey));
 	} 
 	
+	//checks to see if username already exists
+	//if not, creates a new entry in the user database with info
+	//and a new entry in the password database with the (hashed) password
 	public boolean addUser(String username, String password, String firstName, 
 			String lastName, String email, String network, String interests,
 			String birthday) {
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributesList = result.getAttributes();
+		//checks if username already exists
 		for (Attribute a : attributesList) {
 			if (a.getName().equals(username)) {
 				return new Boolean(false);
 			}
 		}
+		//creates a list with all attributes to be put into the database
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
-		//put password in own database w/ email
-		list.add(new ReplaceableAttribute("password", ""+password,false));
 		list.add(new ReplaceableAttribute("firstName", ""+firstName,false));
 		list.add(new ReplaceableAttribute("lastName", ""+lastName,false));
 		list.add(new ReplaceableAttribute("email", ""+email,false));
@@ -60,22 +63,46 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		list.add(new ReplaceableAttribute("friends", ""+friends, true));
 		db.putAttributes(new PutAttributesRequest("users", username, list, 
 				new UpdateCondition()));
+		
+		//puts hashed password into passwords database
+		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
+		list.add(new ReplaceableAttribute("password",
+				""+String.valueOf(password.hashCode()),true));
+		db.putAttributes(new PutAttributesRequest("passwords", username, l,
+				new UpdateCondition()));
 		return new Boolean(true);
 	}
 	
+	//updates both the user's list of friends as well as the other user's
+	//list of friends
 	public boolean addFriend(String username, String otherUsername, Timestamp time) {
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributeList = result.getAttributes();
-		String friend = otherUsername;
+		String friend = "";
+		Boolean check1 = false;
+		Boolean check2 = false;
 		for (Attribute a : attributeList) {
 			if (a.getName().equals("friends")) {
-				friend+="~"+a.getValue();
+				friend+=a.getValue()+"~";
+				friend+=otherUsername;
 				a.setValue(friend);
-				return new Boolean(true);
+				check1 = true;
 			}
 		}
-		return new Boolean(true);
+		result = db.getAttributes(new GetAttributesRequest("users", 
+				otherUsername));
+		attributeList = result.getAttributes();
+		String f = "";
+		for (Attribute a : attributeList) {
+			if (a.getName().equals("friends")) {
+				f+=a.getValue()+"~";
+				f+=username;
+				a.setValue(f);
+				check2 = true;
+			}
+		}
+		return new Boolean(check1&&check2);
 	}
 	
 	//add an update to the database if novel post
@@ -94,7 +121,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				return new Boolean(true);
 			}
 		}
-		t+=text;
+		t+=username+"~"+text;
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 		list.add(new ReplaceableAttribute("friend", ""+otherUsername, false));
 		list.add(new ReplaceableAttribute("timestamp", ""+time,false));

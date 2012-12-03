@@ -42,23 +42,24 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributesList = result.getAttributes();
-		if (!attributesList.isEmpty()) {
-			return false;
-		} else {
-			List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
-			list.add(new ReplaceableAttribute("password", ""+password,false));
-			list.add(new ReplaceableAttribute("firstName", ""+firstName,false));
-			list.add(new ReplaceableAttribute("lastName", ""+lastName,false));
-			list.add(new ReplaceableAttribute("email", ""+email,false));
-			list.add(new ReplaceableAttribute("network", ""+network,false));
-			list.add(new ReplaceableAttribute("interests", ""+interests, false));
-			list.add(new ReplaceableAttribute("birthday", ""+birthday,false));
-			String friends = "";
-			list.add(new ReplaceableAttribute("friends", ""+friends, true));
-			db.putAttributes(new PutAttributesRequest("users", username, list, 
-					new UpdateCondition()));
-			return true;
+		for (Attribute a : attributesList) {
+			if (a.getName().equals(username)) {
+				return false;
+			}
 		}
+		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
+		list.add(new ReplaceableAttribute("password", ""+password,false));
+		list.add(new ReplaceableAttribute("firstName", ""+firstName,false));
+		list.add(new ReplaceableAttribute("lastName", ""+lastName,false));
+		list.add(new ReplaceableAttribute("email", ""+email,false));
+		list.add(new ReplaceableAttribute("network", ""+network,false));
+		list.add(new ReplaceableAttribute("interests", ""+interests, false));
+		list.add(new ReplaceableAttribute("birthday", ""+birthday,false));
+		String friends = "";
+		list.add(new ReplaceableAttribute("friends", ""+friends, true));
+		db.putAttributes(new PutAttributesRequest("users", username, list, 
+				new UpdateCondition()));
+		return true;
 	}
 	
 	public boolean addFriend(String username, String otherUsername, Timestamp time) {

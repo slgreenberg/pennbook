@@ -34,8 +34,9 @@ public interface Database extends RemoteService {
 	}
 	
 	boolean validateLogin(String username, String password);
-	boolean addUser(String username, String text, String text2,
-					String text3, String text4, String text5, String text6);
+	boolean addUser(String username, String password, String firstName,
+					String LastName, String email, String network, 
+					String interests, String birthday);
 
 	Integer incrementLogins(String username);
 }

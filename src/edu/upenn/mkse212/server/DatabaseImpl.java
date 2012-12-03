@@ -78,6 +78,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Boolean(true);
 	}
 	
+	//add an update to the database if novel post
+	//else it just updates the associated text
 	public boolean addUpdate(String username, String otherUsername, 
 			 Timestamp time, String text) {
 		String t = "";
@@ -86,19 +88,23 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		List<Attribute> attributeList = result.getAttributes();
 		for (Attribute a : attributeList) {
 			if (a.getName().equals("text")) {
-				t+=a.getValue();
+				t+=otherUsername+"~"+a.getValue()+"|";
+				t+=username+"~"+text;
+				a.setValue(t);
+				return new Boolean(true);
 			}
 		}
 		t+=text;
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 		list.add(new ReplaceableAttribute("friend", ""+otherUsername, false));
 		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
-		list.add(new ReplaceableAttribute("text", ""+t,false));
+		list.add(new ReplaceableAttribute("text", ""+t,true));
 		db.putAttributes(new PutAttributesRequest("updates", username, list, 
 				new UpdateCondition()));
 		return new Boolean(true);
 	}
 	
+	//given code
 	public boolean validateLogin(String username, String password) {
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
@@ -111,6 +117,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Boolean(false);
 	}
 	
+	//given code
 	public Integer incrementLogins(String username) {
 		GetAttributesResult result = db.getAttributes(
 			new GetAttributesRequest("users", username));

@@ -38,6 +38,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//checks to see if username already exists
 	//if not, creates a new entry in the user database with info
 	//and a new entry in the password database with the (hashed) password
+	//adds user to online in database
 	public boolean addUser(String username, String password, String firstName, 
 			String lastName, String email, String network, String interests,
 			String birthday) {
@@ -72,6 +73,12 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		l.add(new ReplaceableAttribute("password",
 				""+String.valueOf(password.hashCode()),true));
 		db.putAttributes(new PutAttributesRequest("passwords", username, l,
+				new UpdateCondition()));
+		
+		//puts user in online database
+		List<ReplaceableAttribute> l1 = new ArrayList<ReplaceableAttribute>();
+		l1.add(new ReplaceableAttribute("online", "true", true));
+		db.putAttributes(new PutAttributesRequest("online", username, l1,
 				new UpdateCondition()));
 		return new Boolean(true);
 	}
@@ -124,6 +131,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Boolean(check1&&check2);
 	}
 	
+	//key posted to
+	//first column posted by
 	//add an update to the database if novel post
 	//else it just updates the associated text
 	public boolean addUpdate(String username, String otherUsername,
@@ -151,8 +160,30 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Boolean(true);
 	}
 	
+	//returns a list of strings representing different posts on a user's
+	//wall including status updates and comments
+	public List<String> getWall(String username) {
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("updates", username));
+		List<Attribute> aList = results.getAttributes();
+		List<String> ret = new ArrayList<String>();
+		for (Attribute a : aList) {
+			if (a.getName().equals("text")) {
+				ret.add(a.getValue());
+			}
+		}
+		return ret;
+	}
+	
+	//TODO figure out how to set user to not online
 	//updated given code to match implemented databases
+	//also adds user to online database
 	public boolean validateLogin(String username, String password) {
+		List<ReplaceableAttribute> list = 
+				new ArrayList<ReplaceableAttribute>();
+		list.add(new ReplaceableAttribute("online", "true", true));
+		db.putAttributes(new PutAttributesRequest("online", 
+				username, list, new UpdateCondition()));
 		if (username.equals("ahae") || username.equals("susangr")) {
 			GetAttributesResult result = db.getAttributes(
 					new GetAttributesRequest("users", username));

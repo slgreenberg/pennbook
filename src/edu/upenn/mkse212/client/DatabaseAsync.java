@@ -17,7 +17,9 @@ public interface DatabaseAsync {
 			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
 	void addUpdate(String username, String otherUsername,
 			String text, AsyncCallback<Boolean> callback)
-					throws IllegalArgumentException;
+			throws IllegalArgumentException;
+	void getWall(String username, AsyncCallback<Boolean> callback)
+		throws IllegalArgumentException;
 	
 
 }

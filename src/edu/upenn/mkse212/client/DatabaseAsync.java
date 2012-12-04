@@ -13,10 +13,11 @@ public interface DatabaseAsync {
 		String lastName, String email, String network, String interests,
 		String birthday, AsyncCallback<Boolean> callback)
 		throws IllegalArgumentException;
-	/*void addFriend(String username, String otherUsername) 
-	//		throws IllegalArgumentException;
-	//void addUpdate(String username, String otherUsername,
-	//		String text) throws IllegalArgumentException;
-	*/
+	void addFriend(String username, String otherUsername, 
+			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
+	void addUpdate(String username, String otherUsername,
+			String text, AsyncCallback<Boolean> callback)
+					throws IllegalArgumentException;
+	
 
 }

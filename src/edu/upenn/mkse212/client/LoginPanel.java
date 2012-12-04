@@ -52,6 +52,7 @@ public class LoginPanel {
 								if (!result.booleanValue()) {
 									parent.popupBox("Error", "Login incorrect");
 								} else {
+									//TODO change what user sees in wallPanel
 									parent.getWallPanel().display(username);
 								}
 							}

@@ -39,10 +39,11 @@ public interface Database extends RemoteService {
 					String LastName, String email, String network, 
 					String interests, String birthday);
 	
-	/*boolean addFriend(String username, String otherUsername);
-	//
-	//boolean addUpdate(String username, String otherUsername, String text);
-	*/
+	boolean addFriend(String username, String otherUsername);
+	
+	boolean addUpdate(String username, String otherUsername,
+			String text);
+	
 	Integer incrementLogins(String username);
 	
 }

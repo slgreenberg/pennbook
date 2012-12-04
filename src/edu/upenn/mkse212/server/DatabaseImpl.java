@@ -41,6 +41,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	public boolean addUser(String username, String password, String firstName, 
 			String lastName, String email, String network, String interests,
 			String birthday) {
+		String time = String.valueOf(System.currentTimeMillis());
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributesList = result.getAttributes();
@@ -60,6 +61,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		list.add(new ReplaceableAttribute("birthday", ""+birthday,false));
 		String friends = "";
 		list.add(new ReplaceableAttribute("friends", ""+friends, true));
+		list.add(new ReplaceableAttribute("lastLogin", ""+time,true));
+		list.add(new ReplaceableAttribute("numLogins", "1",true));
 		
 		db.putAttributes(new PutAttributesRequest("users", username, list, 
 				new UpdateCondition()));
@@ -78,7 +81,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//and adds both to friends database
 	public boolean addFriend(String username, String otherUsername) {
 		//populates users' store of friends
-		long time = System.currentTimeMillis();
+		String time = String.valueOf(System.currentTimeMillis());
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributeList = result.getAttributes();
@@ -125,7 +128,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//else it just updates the associated text
 	public boolean addUpdate(String username, String otherUsername,
 			String text) {
-		long time = System.currentTimeMillis();
+		String time = String.valueOf(System.currentTimeMillis());
 		String t = "";
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("updates", username));
@@ -141,14 +144,12 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		t+=username+"~"+text;
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 		list.add(new ReplaceableAttribute("friend", ""+otherUsername, false));
-		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		list.add(new ReplaceableAttribute("timestamp", ""+time,true));
 		list.add(new ReplaceableAttribute("text", ""+t,true));
 		db.putAttributes(new PutAttributesRequest("updates", username, list, 
 				new UpdateCondition()));
 		return new Boolean(true);
 	}
-	
-	
 	
 	//updated given code to match implemented databases
 	public boolean validateLogin(String username, String password) {

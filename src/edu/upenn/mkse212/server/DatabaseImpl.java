@@ -205,6 +205,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		}
 	}
 	
+	//returns a list of a user's friends that are currently online
+	//get list of friends and iterates over the list to see if there
+	//has been activity in the past 5 minutes
 	public List<String> getOnline(String username) {
 		List<String> online = new ArrayList<String>();
 		long time = System.currentTimeMillis();
@@ -234,6 +237,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return online;
 	}
 	
+	//given the querrying user and their query, returns a set of strings
+	//representing the possible usernames they could be looking for
 	public Set<String> getSuggestions(String username, String query) {
 		Set<String> sugg = new HashSet<String>();
 		GetAttributesResult results = db.getAttributes(
@@ -254,6 +259,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return sugg;
 	}
 	
+	//allows the user the change what their interests are
 	public boolean updateInterests(String username, String update) {
 		updateOnline(username);
 		GetAttributesResult results = db.getAttributes(
@@ -268,6 +274,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return false;
 	}
 	
+	//creates the file for adsorption
+	//gets all friendships from all users
+	//TODO add network and interests
 	public void getAllConnections() {
 		try {
 			BufferedWriter buff = new BufferedWriter(new FileWriter("adsorption.txt"));

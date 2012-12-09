@@ -58,7 +58,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		list.add(new ReplaceableAttribute("lastName", ""+lastName,false));
 		list.add(new ReplaceableAttribute("email", ""+email,false));
 		list.add(new ReplaceableAttribute("network", ""+network,false));
-		list.add(new ReplaceableAttribute("interests", ""+interests, false));
+		list.add(new ReplaceableAttribute("interests", ""+interests, true));
 		list.add(new ReplaceableAttribute("birthday", ""+birthday,false));
 		String friends = "";
 		list.add(new ReplaceableAttribute("friends", ""+friends, true));
@@ -77,7 +77,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		
 		//puts user in online database
 		List<ReplaceableAttribute> l1 = new ArrayList<ReplaceableAttribute>();
-		l1.add(new ReplaceableAttribute("online", "true", true));
+		l1.add(new ReplaceableAttribute("timestamp", String.valueOf(time), true));
 		db.putAttributes(new PutAttributesRequest("online", username, l1,
 				new UpdateCondition()));
 		return new Boolean(true);
@@ -88,6 +88,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//and adds both to friends database
 	public boolean addFriend(String username, String otherUsername) {
 		//populates users' store of friends
+		updateOnline(username);
 		String time = String.valueOf(System.currentTimeMillis());
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
@@ -135,8 +136,11 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//first column posted by
 	//add an update to the database if novel post
 	//else it just updates the associated text
+	//username = posted to
+	//otherUsername = posted by
 	public boolean addUpdate(String username, String otherUsername,
 			String text) {
+		updateOnline(otherUsername);
 		String time = String.valueOf(System.currentTimeMillis());
 		String t = "";
 		GetAttributesResult result = db.getAttributes(
@@ -163,6 +167,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//returns a list of strings representing different posts on a user's
 	//wall including status updates and comments
 	public List<String> getWall(String username) {
+		updateOnline(username);
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("updates", username));
 		List<Attribute> aList = results.getAttributes();
@@ -175,13 +180,35 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return ret;
 	}
 	
-	//TODO figure out how to set user to not online
+	/*public List<String> getUpdates(String username) {
+		updateOnline(username);
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("updates",username));
+		List<String> ret = new ArrayList<String>();
+		return ret;
+	}*/
+	
+	public void updateOnline(String username) {
+		long time = System.currentTimeMillis();
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("online",username));
+		List<Attribute> aList = results.getAttributes();
+		for (Attribute a : aList) {
+			if (a.getName().equals("timestamp")) {
+				a.setValue(String.valueOf(time));
+			}
+		}
+	}
+	
 	//updated given code to match implemented databases
 	//also adds user to online database
 	public boolean validateLogin(String username, String password) {
+		updateOnline(username);
 		List<ReplaceableAttribute> list = 
 				new ArrayList<ReplaceableAttribute>();
-		list.add(new ReplaceableAttribute("online", "true", true));
+		long time = System.currentTimeMillis();
+		list.add(new ReplaceableAttribute("timestamp", 
+				String.valueOf(time), true));
 		db.putAttributes(new PutAttributesRequest("online", 
 				username, list, new UpdateCondition()));
 		if (username.equals("ahae") || username.equals("susangr")) {

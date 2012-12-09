@@ -46,6 +46,8 @@ public interface Database extends RemoteService {
 	boolean addUpdate(String username, String otherUsername,
 			String text);
 	
+	void updateOnline(String username);
+	
 	List<String> getWall(String username);
 	
 	Integer incrementLogins(String username);

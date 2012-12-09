@@ -297,6 +297,38 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		}
 	}
 	
+	//creates file for use of visualization
+	//gets all friends of a user, and all people who are also in their network
+	public void visualizationFile(String username) {
+		try {
+			String network = "";
+			BufferedWriter buff = new BufferedWriter(new FileWriter("visualize.txt"));
+			GetAttributesResult r = db.getAttributes(
+					new GetAttributesRequest("users",username));
+			List<Attribute> l = r.getAttributes();
+			for (Attribute a : l) {
+				if (a.getName().equals("network")) {
+					network+=a.getValue();
+				}
+			}
+			SelectResult results = db.select(
+					new SelectRequest("select * from friends"));
+			List<Item> list = results.getItems();
+			for (Item i : list) {
+				List<Attribute> aList = i.getAttributes();
+				for (Attribute a : aList) {
+					if(a.getName().equals("friends")) {
+						buff.write(i.getName()+"\t"+a.getValue());
+						buff.newLine();
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	//updated given code to match implemented databases
 	//also adds user to online database
 	public boolean validateLogin(String username, String password) {

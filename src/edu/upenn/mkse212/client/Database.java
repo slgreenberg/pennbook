@@ -59,6 +59,8 @@ public interface Database extends RemoteService {
 	
 	Set<String> getSuggestions(String username, String query);
 	
+	void visualizationFile(String username);
+	
 	void getAllConnections();
 	
 }

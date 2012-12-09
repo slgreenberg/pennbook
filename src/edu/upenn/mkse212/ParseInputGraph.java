@@ -23,7 +23,7 @@ public class ParseInputGraph {
     //and the node it points to (arr[1]) and puts them into the
     //key value storage and increments the count
     for ( String fname : here.list()) {
-      if (fname.startsWith("adsorption")) {
+      if (fname.startsWith("visualize")) {
     	  System.out.println("Parsing " + fname + "...");
     	  BufferedReader br = new BufferedReader(new FileReader(fname));
     	  while (br.ready()) {

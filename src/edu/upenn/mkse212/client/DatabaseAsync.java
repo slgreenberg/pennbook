@@ -30,6 +30,8 @@ public interface DatabaseAsync {
 		throws IllegalArgumentException;
 	void getAllConnections(AsyncCallback<Boolean> callback) 
 			throws IllegalArgumentException;
+	void visualizationFile(String username, AsyncCallback<Boolean> callback)
+		throws IllegalArgumentException;
 	
 
 }

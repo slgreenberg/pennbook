@@ -16,6 +16,9 @@ package edu.upenn.mkse212.server;
 
 import edu.upenn.mkse212.client.Database;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -121,8 +124,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
 		list.add(new ReplaceableAttribute("friend", ""+otherUsername,false));
-		l.add(new ReplaceableAttribute("friend", ""+username,false));
 		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		l.add(new ReplaceableAttribute("friend", ""+username,false));
 		l.add(new ReplaceableAttribute("timestamp", ""+time,false));
 		db.putAttributes(new PutAttributesRequest("friends", username, list,
 				new UpdateCondition()));
@@ -231,6 +234,26 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return online;
 	}
 	
+	public Set<String> getSuggestions(String username, String query) {
+		Set<String> sugg = new HashSet<String>();
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("users",username));
+		List<Attribute> list = results.getAttributes();
+		String friends = "";
+		for (Attribute a : list) {
+			if (a.getName().equals("friends")) {
+				friends+=a.getValue();
+			}
+		}
+		String[] f = friends.split("~");
+		for(String s : f) {
+			if (s.toLowerCase().contains(query.toLowerCase())) {
+				sugg.add(s);
+			}
+		}
+		return sugg;
+	}
+	
 	public boolean updateInterests(String username, String update) {
 		updateOnline(username);
 		GetAttributesResult results = db.getAttributes(
@@ -243,6 +266,26 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			}
 		}
 		return false;
+	}
+	
+	public void getAllConnections() {
+		try {
+			BufferedWriter buff = new BufferedWriter(new FileWriter("adsorption.txt"));
+			SelectResult results = db.select(
+					new SelectRequest("select * from friends"));
+			List<Item> list = results.getItems();
+			for (Item i : list) {
+				List<Attribute> aList = i.getAttributes();
+				for (Attribute a : aList) {
+					if(a.getName().equals("friends")) {
+						buff.write(i.getName()+"\t"+a.getValue());
+						buff.newLine();
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//updated given code to match implemented databases

@@ -15,6 +15,7 @@
 package edu.upenn.mkse212.client;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -55,5 +56,9 @@ public interface Database extends RemoteService {
 	List<String> getWall(String username);
 	
 	Integer incrementLogins(String username);
+	
+	Set<String> getSuggestions(String username, String query);
+	
+	void getAllConnections();
 	
 }

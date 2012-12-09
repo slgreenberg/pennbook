@@ -26,6 +26,10 @@ public interface DatabaseAsync {
 			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
 	void getOnline(String username, AsyncCallback<Boolean> callback)
 			throws IllegalArgumentException;
+	void getSuggestions(String username, String query, AsyncCallback<Boolean> callback)
+		throws IllegalArgumentException;
+	void getAllConnections(AsyncCallback<Boolean> callback) 
+			throws IllegalArgumentException;
 	
 
 }

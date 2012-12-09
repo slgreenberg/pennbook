@@ -188,6 +188,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return ret;
 	}*/
 	
+	//method to be used throwout databaseimpl
+	//updates the timestamp for a user's latest activity
 	public void updateOnline(String username) {
 		long time = System.currentTimeMillis();
 		GetAttributesResult results = db.getAttributes(
@@ -198,6 +200,49 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				a.setValue(String.valueOf(time));
 			}
 		}
+	}
+	
+	public List<String> getOnline(String username) {
+		List<String> online = new ArrayList<String>();
+		long time = System.currentTimeMillis();
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("friends",username));
+		List<Attribute> aList = results.getAttributes();
+		String friends = "";
+		for (Attribute a : aList) {
+			if (a.getName().equals("friends")) {
+				friends+=a.getValue();
+			}
+		}
+		String[] arr = friends.split("~");
+		for (String s : arr) {
+			GetAttributesResult r = db.getAttributes(
+					new GetAttributesRequest("online",s));
+			List<Attribute> list = results.getAttributes();
+			for (Attribute a : list) {
+				if (a.getName().equals("timestamp")) {
+					long ts = Long.parseLong(a.getValue());
+					if ((time - ts) > 300000.0) {
+						online.add(s);
+					}
+				}
+			}
+		}
+		return online;
+	}
+	
+	public boolean updateInterests(String username, String update) {
+		updateOnline(username);
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("users",username));
+		List<Attribute> aList = results.getAttributes();
+		for (Attribute a : aList) {
+			if (a.getName().equals("interests")) {
+				a.setValue(update);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	//updated given code to match implemented databases

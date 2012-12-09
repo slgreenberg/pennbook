@@ -22,6 +22,10 @@ public interface DatabaseAsync {
 		throws IllegalArgumentException;
 	void updateOnline(String username, AsyncCallback<Boolean> callback)
 		throws IllegalArgumentException;
+	void updateInterests(String username, String update,
+			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
+	void getOnline(String username, AsyncCallback<Boolean> callback)
+			throws IllegalArgumentException;
 	
 
 }

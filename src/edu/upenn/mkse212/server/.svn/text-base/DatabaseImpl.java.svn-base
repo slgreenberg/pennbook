@@ -157,44 +157,72 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//else it just updates the associated text
 	//username = posted to
 	//otherUsername = posted by
-	//TODO CHANGE
-	public boolean addUpdate(String username, String otherUsername,
-			String text) {
+	public boolean addPost(String username, String otherUsername, String text) {
 		updateOnline(otherUsername);
 		String time = String.valueOf(System.currentTimeMillis());
-		String t = "";
+		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
+		l.add(new ReplaceableAttribute("postedBy", ""+otherUsername,false));
+		l.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		l.add(new ReplaceableAttribute("postID", ""+time,false));
+		db.putAttributes(new PutAttributesRequest("updates", username, l,
+				new UpdateCondition()));
+		
+		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
+		list.add(new ReplaceableAttribute("post",""+text,false));
+		list.add(new ReplaceableAttribute("comments", "",true));
+		db.putAttributes(new PutAttributesRequest("posts", time, list,
+				new UpdateCondition()));
+		return true;
+	}
+	
+	//username passed the the user that is adding the comment
+	//postID implicitly tells us who it is posted to
+	public boolean addComment(String username, String text, String postID) {
+		updateOnline(username);
 		GetAttributesResult result = db.getAttributes(
-				new GetAttributesRequest("updates", username));
-		List<Attribute> attributeList = result.getAttributes();
-		for (Attribute a : attributeList) {
-			if (a.getName().equals("text")) {
-				t+=otherUsername+"~"+a.getValue()+"|";
-				t+=username+"~"+text;
+				new GetAttributesRequest("posts",postID));
+		List<Attribute> l = result.getAttributes();
+		String t = "";
+		for(Attribute a : l) {
+			if (a.getName().equals("comments")) {
+				t = t+username+"|"+text+"~"+a.getValue();
 				a.setValue(t);
-				return new Boolean(true);
 			}
 		}
-		t+=username+"~"+text;
-		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
-		list.add(new ReplaceableAttribute("friend", ""+otherUsername, false));
-		list.add(new ReplaceableAttribute("timestamp", ""+time,true));
-		list.add(new ReplaceableAttribute("text", ""+t,true));
-		db.putAttributes(new PutAttributesRequest("updates", username, list, 
-				new UpdateCondition()));
-		return new Boolean(true);
+		return true;
 	}
+	
+	//returns a list where the first entry is the original post
+	//and each subsequent entry is the associated comments
+	public List<String> getPostAndComment(String postID) {
+		List<String> ret = new LinkedList<String>();
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("posts",postID));
+		List<Attribute> l = results.getAttributes();
+		int count = 1;
+		for (Attribute a : l) {
+			if (a.getName().equals("post")) {
+				ret.add(0, a.getValue());
+			} else if (a.getName().equals("comments")) {
+				ret.add(count, a.getValue());
+				count++;
+			}
+		}
+		return ret;
+	}
+	
 	
 	//returns a list of strings representing different posts on a user's
 	//wall including status updates and comments
-	public String getWall(String username) {
+	public List<List<String>> getWall(String username) {
 		updateOnline(username);
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("updates", username));
 		List<Attribute> aList = results.getAttributes();
-		String ret = "";
+		List<List<String>> ret = new LinkedList<List<String>>();
 		for (Attribute a : aList) {
-			if (a.getName().equals("text")) {
-				ret+=a.getValue();
+			if (a.getName().equals("postID")) {
+				ret.add(getPostAndComment(a.getValue()));
 			}
 		}
 		return ret;

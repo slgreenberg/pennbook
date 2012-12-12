@@ -44,8 +44,10 @@ public interface Database extends RemoteService {
 	
 	boolean addFriend(String username, String otherUsername);
 	
-	boolean addUpdate(String username, String otherUsername,
+	boolean addPost(String username, String otherUsername,
 			String text);
+	
+	boolean addComment(String username, String text, String postID);
 	
 	void updateOnline(String username);
 	
@@ -53,7 +55,7 @@ public interface Database extends RemoteService {
 	
 	List<String> getOnline(String username);
 	
-	String getWall(String username);
+	List<List<String>> getWall(String username);
 	
 	Integer incrementLogins(String username);
 	
@@ -66,5 +68,7 @@ public interface Database extends RemoteService {
 	String getNetwork(String username);
 	
 	String[] getInfo(String username);
+	
+	List<String> getPostAndComment(String postID);
 	
 }

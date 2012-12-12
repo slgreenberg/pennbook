@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="/home/mkse212/workspace/PennBook/war/WEB-INF/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/home/mkse212/workspace/PennBook/war/WEB-INF/lib/httpclient-4.2.1.jar"/>
 	<classpathentry kind="lib" path="/home/mkse212/workspace/PennBook/war/WEB-INF/lib/httpcore-4.2.1.jar"/>
+	<classpathentry kind="lib" path="/home/mkse212/workspace/PennBook/war/WEB-INF/lib/je-4.0.103.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

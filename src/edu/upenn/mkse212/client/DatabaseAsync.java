@@ -1,5 +1,8 @@
 package edu.upenn.mkse212.client;
 
+import java.util.List;
+import java.util.Set;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
@@ -18,23 +21,23 @@ public interface DatabaseAsync {
 	void addUpdate(String username, String otherUsername,
 			String text, AsyncCallback<Boolean> callback)
 			throws IllegalArgumentException;
-	void getWall(String username, AsyncCallback<Boolean> callback)
+	void getWall(String username, AsyncCallback<List<String>> callback)
 		throws IllegalArgumentException;
-	void updateOnline(String username, AsyncCallback<Boolean> callback)
+	void updateOnline(String username, AsyncCallback<Void> callback)
 		throws IllegalArgumentException;
 	void updateInterests(String username, String update,
 			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
-	void getOnline(String username, AsyncCallback<Boolean> callback)
+	void getOnline(String username, AsyncCallback<List<String>> callback)
 			throws IllegalArgumentException;
-	void getSuggestions(String username, String query, AsyncCallback<Boolean> callback)
+	void getSuggestions(String username, String query, AsyncCallback<Set<String>> callback)
 		throws IllegalArgumentException;
 	void getAllConnections(AsyncCallback<Boolean> callback) 
 			throws IllegalArgumentException;
 	void visualizationFile(String username, AsyncCallback<Boolean> callback)
 		throws IllegalArgumentException;
-	void getNetwork(String username, AsyncCallback<Boolean> callback)
+	void getNetwork(String username, AsyncCallback<String> callback)
 		throws IllegalArgumentException;
-	void getInfo(String username, AsyncCallback<Boolean> callback)
+	void getInfo(String username, AsyncCallback<Integer> callback)
 			throws IllegalArgumentException;
 	
 

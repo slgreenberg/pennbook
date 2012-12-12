@@ -1,14 +1,14 @@
 10
 
 dir
-1077
+1648
 svn://ds01.seas.upenn.edu:10212/MKSE212-F12/projects/team11/PennBook
 svn://ds01.seas.upenn.edu:10212
 
 
 
-2012-11-29T21:33:03.407479Z
-1077
+2012-12-12T04:04:46.491074Z
+1579
 susangr
 
 
@@ -34,12 +34,46 @@ susangr
 
 immediates
 
+README.txt
+file
+
+
+
+
+2012-12-02T21:54:25.735466Z
+c3fe053d713a46ccd2e2e9e9f7e56833
+2012-12-09T22:08:46.669393Z
+1453
+susangr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3218
+
 .settings
 dir
 
 build.xml
 file
-1453
+
 
 
 
@@ -76,7 +110,7 @@ dir
 
 .classpath
 file
-1198
+
 
 
 
@@ -116,7 +150,7 @@ dir
 
 PennBook.war
 file
-1453
+
 
 
 
@@ -150,7 +184,7 @@ has-props
 
 .project
 file
-1198
+
 
 
 
@@ -184,7 +218,7 @@ susangr
 
 PennBook.launch
 file
-1453
+
 
 
 
@@ -221,38 +255,4 @@ dir
 
 war
 dir
-
-README.txt
-file
-1453
-
-
-
-2012-12-02T21:54:25.735466Z
-c3fe053d713a46ccd2e2e9e9f7e56833
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3218
 

@@ -24,6 +24,18 @@ public interface DatabaseAsync {
 		throws IllegalArgumentException;
 	void updateInterests(String username, String update,
 			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
+	void getOnline(String username, AsyncCallback<Boolean> callback)
+			throws IllegalArgumentException;
+	void getSuggestions(String username, String query, AsyncCallback<Boolean> callback)
+		throws IllegalArgumentException;
+	void getAllConnections(AsyncCallback<Boolean> callback) 
+			throws IllegalArgumentException;
+	void visualizationFile(String username, AsyncCallback<Boolean> callback)
+		throws IllegalArgumentException;
+	void getNetwork(String username, AsyncCallback<Boolean> callback)
+		throws IllegalArgumentException;
+	void getInfo(String username, AsyncCallback<Boolean> callback)
+			throws IllegalArgumentException;
 	
 
 }

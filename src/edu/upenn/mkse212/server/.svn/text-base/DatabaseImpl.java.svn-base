@@ -16,6 +16,9 @@ package edu.upenn.mkse212.server;
 
 import edu.upenn.mkse212.client.Database;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -83,7 +86,19 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Boolean(true);
 	}
 	
-	//updates both the user's list of friends as well as the other user's
+	public String getNetwork(String username) {
+		GetAttributesResult result = db.getAttributes(
+				new GetAttributesRequest("users",username));
+		List<Attribute> aList = result.getAttributes();
+		for (Attribute a : aList) {
+			if (a.getName().equals("network")) {
+				return a.getValue();
+			}
+		}
+		return null;
+	}
+	
+	//updates both the user's list of  as well as the other user's
 	//list of friends
 	//and adds both to friends database
 	public boolean addFriend(String username, String otherUsername) {
@@ -121,9 +136,13 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
 		list.add(new ReplaceableAttribute("friend", ""+otherUsername,false));
-		l.add(new ReplaceableAttribute("friend", ""+username,false));
 		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		list.add(new ReplaceableAttribute("network",
+				""+getNetwork(username),false));
+		l.add(new ReplaceableAttribute("friend", ""+username,false));
 		l.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		l.add(new ReplaceableAttribute("network",
+				""+getNetwork(otherUsername),false));
 		db.putAttributes(new PutAttributesRequest("friends", username, list,
 				new UpdateCondition()));
 		db.putAttributes(new PutAttributesRequest("friends", otherUsername, l,
@@ -188,6 +207,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return ret;
 	}*/
 	
+	//method to be used throwout databaseimpl
+	//updates the timestamp for a user's latest activity
 	public void updateOnline(String username) {
 		long time = System.currentTimeMillis();
 		GetAttributesResult results = db.getAttributes(
@@ -200,6 +221,61 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		}
 	}
 	
+	//returns a list of a user's friends that are currently online
+	//get list of friends and iterates over the list to see if there
+	//has been activity in the past 5 minutes
+	public List<String> getOnline(String username) {
+		List<String> online = new ArrayList<String>();
+		long time = System.currentTimeMillis();
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("friends",username));
+		List<Attribute> aList = results.getAttributes();
+		String friends = "";
+		for (Attribute a : aList) {
+			if (a.getName().equals("friends")) {
+				friends+=a.getValue();
+			}
+		}
+		String[] arr = friends.split("~");
+		for (String s : arr) {
+			GetAttributesResult r = db.getAttributes(
+					new GetAttributesRequest("online",s));
+			List<Attribute> list = results.getAttributes();
+			for (Attribute a : list) {
+				if (a.getName().equals("timestamp")) {
+					long ts = Long.parseLong(a.getValue());
+					if ((time - ts) > 300000.0) {
+						online.add(s);
+					}
+				}
+			}
+		}
+		return online;
+	}
+	
+	//given the querrying user and their query, returns a set of strings
+	//representing the possible usernames they could be looking for
+	public Set<String> getSuggestions(String username, String query) {
+		Set<String> sugg = new HashSet<String>();
+		GetAttributesResult results = db.getAttributes(
+				new GetAttributesRequest("users",username));
+		List<Attribute> list = results.getAttributes();
+		String friends = "";
+		for (Attribute a : list) {
+			if (a.getName().equals("friends")) {
+				friends+=a.getValue();
+			}
+		}
+		String[] f = friends.split("~");
+		for(String s : f) {
+			if (s.toLowerCase().contains(query.toLowerCase())) {
+				sugg.add(s);
+			}
+		}
+		return sugg;
+	}
+	
+	//allows the user the change what their interests are
 	public boolean updateInterests(String username, String update) {
 		updateOnline(username);
 		GetAttributesResult results = db.getAttributes(
@@ -213,6 +289,89 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		}
 		return false;
 	}
+	
+	//creates the file for adsorption
+	//gets all friendships from all users
+	//TODO add network and interests
+	public void getAllConnections() {
+		try {
+			BufferedWriter buff = new BufferedWriter(new FileWriter("adsorption.txt"));
+			SelectResult results = db.select(
+					new SelectRequest("select * from friends"));
+			List<Item> list = results.getItems();
+			for (Item i : list) {
+				List<Attribute> aList = i.getAttributes();
+				for (Attribute a : aList) {
+					if(a.getName().equals("friends")) {
+						buff.write(i.getName()+"\t"+a.getValue());
+						buff.newLine();
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//creates file for use of visualization
+	//gets all friends of a user, and all people who are also in their network
+	public void visualizationFile(String username) {
+		try {
+			String network = "";
+			BufferedWriter buff = new BufferedWriter(new FileWriter("visualize.txt"));
+			GetAttributesResult r = db.getAttributes(
+					new GetAttributesRequest("users",username));
+			List<Attribute> l = r.getAttributes();
+			for (Attribute a : l) {
+				if (a.getName().equals("network")) {
+					network+=a.getValue();
+				}
+			}
+			GetAttributesResult req = db.getAttributes(
+					new GetAttributesRequest("friends",username));
+			List<Attribute> l2 = req.getAttributes();
+			for (Attribute a : l2) {
+				if (a.getName().equals("friend")) {
+					buff.write(username+"\t"+a.getValue());
+				}
+			}
+			SelectResult nResult = db.select(new SelectRequest
+					("select username from friends " +"where network = " +
+							"'"+network+"'"+"username !='"+username+"'"));
+			List<Item> ilist = nResult.getItems();
+			for (Item i : ilist) {
+				buff.write(username+"\t"+i.getName());
+				buff.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	//returns an array containing all of the specified user's info
+	public String[] getInfo(String username) {
+		String ret[] = new String[6];
+		GetAttributesResult result = db.getAttributes(
+				new GetAttributesRequest("users",username));
+		List<Attribute> list = result.getAttributes();
+		for(Attribute a : list) {
+			if (a.getName().equals("firstName")) {
+				ret[0] = a.getValue();
+			} else if (a.getName().equals("lastName")) {
+				ret[1] = a.getValue();
+			} else if (a.getName().equals("email")) {
+				ret[2] = a.getValue();
+			} else if (a.getName().equals("network")) {
+				ret[3] = a.getValue();
+			} else if (a.getName().equals("interest")) {
+				ret[4] = a.getValue();
+			} else if (a.getName().equals("birthday")) {
+				ret[5] = a.getValue();
+			}
+		}
+		return ret;
+	}
+	
 	
 	//updated given code to match implemented databases
 	//also adds user to online database

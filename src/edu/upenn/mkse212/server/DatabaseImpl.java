@@ -86,7 +86,19 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return new Boolean(true);
 	}
 	
-	//updates both the user's list of friends as well as the other user's
+	public String getNetwork(String username) {
+		GetAttributesResult result = db.getAttributes(
+				new GetAttributesRequest("users",username));
+		List<Attribute> aList = result.getAttributes();
+		for (Attribute a : aList) {
+			if (a.getName().equals("network")) {
+				return a.getValue();
+			}
+		}
+		return null;
+	}
+	
+	//updates both the user's list of  as well as the other user's
 	//list of friends
 	//and adds both to friends database
 	public boolean addFriend(String username, String otherUsername) {
@@ -125,8 +137,12 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
 		list.add(new ReplaceableAttribute("friend", ""+otherUsername,false));
 		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		list.add(new ReplaceableAttribute("network",
+				""+getNetwork(username),false));
 		l.add(new ReplaceableAttribute("friend", ""+username,false));
 		l.add(new ReplaceableAttribute("timestamp", ""+time,false));
+		l.add(new ReplaceableAttribute("network",
+				""+getNetwork(otherUsername),false));
 		db.putAttributes(new PutAttributesRequest("friends", username, list,
 				new UpdateCondition()));
 		db.putAttributes(new PutAttributesRequest("friends", otherUsername, l,
@@ -311,21 +327,49 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 					network+=a.getValue();
 				}
 			}
-			SelectResult results = db.select(
-					new SelectRequest("select * from friends"));
-			List<Item> list = results.getItems();
-			for (Item i : list) {
-				List<Attribute> aList = i.getAttributes();
-				for (Attribute a : aList) {
-					if(a.getName().equals("friends")) {
-						buff.write(i.getName()+"\t"+a.getValue());
-						buff.newLine();
-					}
+			GetAttributesResult req = db.getAttributes(
+					new GetAttributesRequest("friends",username));
+			List<Attribute> l2 = req.getAttributes();
+			for (Attribute a : l2) {
+				if (a.getName().equals("friend")) {
+					buff.write(username+"\t"+a.getValue());
 				}
+			}
+			SelectResult nResult = db.select(new SelectRequest
+					("select username from friends " +"where network = " +
+							"'"+network+"'"+"username !='"+username+"'"));
+			List<Item> ilist = nResult.getItems();
+			for (Item i : ilist) {
+				buff.write(username+"\t"+i.getName());
+				buff.newLine();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}	
+	}
+	
+	//returns an array containing all of the specified user's info
+	public String[] getInfo(String username) {
+		String ret[] = new String[6];
+		GetAttributesResult result = db.getAttributes(
+				new GetAttributesRequest("users",username));
+		List<Attribute> list = result.getAttributes();
+		for(Attribute a : list) {
+			if (a.getName().equals("firstName")) {
+				ret[0] = a.getValue();
+			} else if (a.getName().equals("lastName")) {
+				ret[1] = a.getValue();
+			} else if (a.getName().equals("email")) {
+				ret[2] = a.getValue();
+			} else if (a.getName().equals("network")) {
+				ret[3] = a.getValue();
+			} else if (a.getName().equals("interest")) {
+				ret[4] = a.getValue();
+			} else if (a.getName().equals("birthday")) {
+				ret[5] = a.getValue();
+			}
 		}
+		return ret;
 	}
 	
 	

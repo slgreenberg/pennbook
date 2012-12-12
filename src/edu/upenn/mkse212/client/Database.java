@@ -63,4 +63,8 @@ public interface Database extends RemoteService {
 	
 	void getAllConnections();
 	
+	String getNetwork(String username);
+	
+	String[] getInfo(String username);
+	
 }

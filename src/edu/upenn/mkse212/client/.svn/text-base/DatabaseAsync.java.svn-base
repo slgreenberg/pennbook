@@ -37,7 +37,7 @@ public interface DatabaseAsync {
 		throws IllegalArgumentException;
 	void getNetwork(String username, AsyncCallback<String> callback)
 		throws IllegalArgumentException;
-	void getInfo(String username, AsyncCallback<Integer> callback)
+	void getInfo(String username, AsyncCallback<String[]> callback)
 			throws IllegalArgumentException;
 	
 

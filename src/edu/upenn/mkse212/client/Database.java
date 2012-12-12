@@ -53,7 +53,7 @@ public interface Database extends RemoteService {
 	
 	List<String> getOnline(String username);
 	
-	List<String> getWall(String username);
+	String getWall(String username);
 	
 	Integer incrementLogins(String username);
 	

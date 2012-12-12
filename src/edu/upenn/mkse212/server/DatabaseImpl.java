@@ -157,6 +157,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//else it just updates the associated text
 	//username = posted to
 	//otherUsername = posted by
+	//TODO CHANGE
 	public boolean addUpdate(String username, String otherUsername,
 			String text) {
 		updateOnline(otherUsername);
@@ -185,15 +186,15 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//returns a list of strings representing different posts on a user's
 	//wall including status updates and comments
-	public List<String> getWall(String username) {
+	public String getWall(String username) {
 		updateOnline(username);
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("updates", username));
 		List<Attribute> aList = results.getAttributes();
-		List<String> ret = new ArrayList<String>();
+		String ret = "";
 		for (Attribute a : aList) {
 			if (a.getName().equals("text")) {
-				ret.add(a.getValue());
+				ret+=a.getValue();
 			}
 		}
 		return ret;
@@ -350,7 +351,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//returns an array containing all of the specified user's info
 	public String[] getInfo(String username) {
-		String ret[] = new String[6];
+		String ret[] = new String[7];
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users",username));
 		List<Attribute> list = result.getAttributes();
@@ -363,12 +364,13 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				ret[2] = a.getValue();
 			} else if (a.getName().equals("network")) {
 				ret[3] = a.getValue();
-			} else if (a.getName().equals("interest")) {
+			} else if (a.getName().equals("interests")) {
 				ret[4] = a.getValue();
 			} else if (a.getName().equals("birthday")) {
 				ret[5] = a.getValue();
-			}
+			} 
 		}
+		ret[6] = username;
 		return ret;
 	}
 	

@@ -21,7 +21,7 @@ public interface DatabaseAsync {
 	void addUpdate(String username, String otherUsername,
 			String text, AsyncCallback<Boolean> callback)
 			throws IllegalArgumentException;
-	void getWall(String username, AsyncCallback<List<String>> callback)
+	void getWall(String username, AsyncCallback<String> callback)
 		throws IllegalArgumentException;
 	void updateOnline(String username, AsyncCallback<Void> callback)
 		throws IllegalArgumentException;
@@ -37,7 +37,7 @@ public interface DatabaseAsync {
 		throws IllegalArgumentException;
 	void getNetwork(String username, AsyncCallback<String> callback)
 		throws IllegalArgumentException;
-	void getInfo(String username, AsyncCallback<Integer> callback)
+	void getInfo(String username, AsyncCallback<String[]> callback)
 			throws IllegalArgumentException;
 	
 

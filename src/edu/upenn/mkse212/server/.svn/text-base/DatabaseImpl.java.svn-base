@@ -228,15 +228,43 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return ret;
 	}
 	
-	/*public List<String> getUpdates(String username) {
+	//not totally correct, probably have to do something a little different 
+	public List<List<String>> getUpdates(String username) {
 		updateOnline(username);
+		List<List<String>> ret = new LinkedList<List<String>>();
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("updates",username));
-		List<String> ret = new ArrayList<String>();
+		List<Attribute> l = results.getAttributes();
+		List<String> friends = new ArrayList<String>();
+		for(Attribute a : l) {
+			if (a.getName().equals("friends")) {
+				String[] f = a.getValue().split("~");
+				for(String s : f) {
+					friends.add(s);
+				}
+			}
+		}
+		SelectResult sr = db.select(new SelectRequest("select userID, postedBy from updates"));
+		List<Item> item = sr.getItems(); 
+		for (Item i : item) {
+			String postID = "";
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("postID")) {
+					postID = a.getValue();
+				}
+				if (a.getName().equals("postedBy")) {
+					if (friends.contains(i.getName())
+							&&friends.contains(a.getValue())) {
+						ret.add(getPostAndComment(postID));
+					}
+				}
+			}
+		} 
+		//want friends to contain both postedTo and postedBy
 		return ret;
-	}*/
+	}
 	
-	//method to be used throwout databaseimpl
+	//method to be used throughout databaseimpl
 	//updates the timestamp for a user's latest activity
 	public void updateOnline(String username) {
 		long time = System.currentTimeMillis();

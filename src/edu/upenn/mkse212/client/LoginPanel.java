@@ -29,7 +29,7 @@ public class LoginPanel {
 		final Button signupButton = new Button("Don't have an account? Signup!");
 		AbsolutePanel p = new AbsolutePanel();
 		p.setWidth("500px");
-		p.setHeight("200px");
+		p.setHeight("300px");
 		p.add(new Label("Username:"), 30, 35);
 		p.add(usernameField, 155, 30);
 		p.add(new Label("Password:"), 30, 85);

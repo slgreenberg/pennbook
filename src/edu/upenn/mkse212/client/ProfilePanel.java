@@ -38,10 +38,13 @@ public class ProfilePanel {
 		p.setHeight("1000px");
 		p.setWidth("900px");
 		
+		
+		// UPDATE INTERESTS 
 		final DialogBox updateInfoBox = new DialogBox();
 		final Label directions = new Label ("Type in your interests to update your interests");
 		final Label interests = new Label ("Interests: ");
 		final TextBox interestField = new TextBox();
+		
 		final Button submitUpdateInfo = new Button("Sumbit", new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				final String interests = interestField.getText();
@@ -51,11 +54,14 @@ public class ProfilePanel {
 								parent.popupBox("RPC failure", "Cannot communicate with the server");
 							} 
 							public void onSuccess(Boolean success) {
+								parent.popupBox("TEST", USERNAME + " " + interests);
 							}
 				});
 				updateInfoBox.hide();
 			}
 		});
+		
+		
 		VerticalPanel vp = new VerticalPanel();
 		vp.add(directions);
 		vp.add(interests);
@@ -79,9 +85,8 @@ public class ProfilePanel {
 	    final Button signout = new Button("SIGN ME OUT");
 	    MultiWordSuggestOracle oracle = new MultiWordSuggestOracle();
 	    final SuggestBox search = new SuggestBox(oracle);
-	    
-	    //KeyPressHandler handler = new KeyEvent();
-	    // search.addKeyPressHandler(handler);
+	    oracle.add("test");
+	    oracle.add("University Of Pennsylvania");
 	    buttonPanel.add(feed);
 	    buttonPanel.add(profile);
 	    buttonPanel.add(signout);
@@ -89,9 +94,7 @@ public class ProfilePanel {
 	    buttonPanel.add(search);
 	    p.insertNorth(buttonPanel, 5, null);
 	    
-	    
-	  
-	    
+	    	    
 	    
 	    final HTML info = new HTML("waiting...");	    
 	    p.insertWest(info, 20, null);

@@ -1,6 +1,7 @@
 package edu.upenn.mkse212.client;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,8 +41,9 @@ public interface DatabaseAsync {
 	void getOnline(String username, AsyncCallback<List<String>> callback)
 			throws IllegalArgumentException;
 	
-	void getSuggestions(String username, String query, AsyncCallback<Set<String>> callback)
-		throws IllegalArgumentException;
+	void getSuggestions(String username, String query,
+			AsyncCallback<Map<String,String>> callback)
+			throws IllegalArgumentException;
 	
 	void getAllConnections(AsyncCallback<Boolean> callback) 
 			throws IllegalArgumentException;

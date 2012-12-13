@@ -115,7 +115,11 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			if (a.getName().equals("friends")) {
 				friend+=a.getValue()+"~";
 				friend+=otherUsername;
-				a.setValue(friend);
+				List<ReplaceableAttribute> li = 
+						new LinkedList<ReplaceableAttribute>();
+				li.add(new ReplaceableAttribute("friends",friend,true));
+				db.putAttributes(new PutAttributesRequest("users",username,li,
+						new UpdateCondition()));
 				check1 = true;
 			}
 		}
@@ -127,7 +131,11 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			if (a.getName().equals("friends")) {
 				f+=a.getValue()+"~";
 				f+=username;
-				a.setValue(f);
+				List<ReplaceableAttribute> li = 
+						new LinkedList<ReplaceableAttribute>();
+				li.add(new ReplaceableAttribute("friends",friend,true));
+				db.putAttributes(new PutAttributesRequest("users",otherUsername,li,
+						new UpdateCondition()));
 				check2 = true;
 			}
 		}
@@ -185,8 +193,12 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		String t = "";
 		for(Attribute a : l) {
 			if (a.getName().equals("comments")) {
-				t = t+username+"|"+text+"~"+a.getValue();
-				a.setValue(t);
+				List<ReplaceableAttribute> li = 
+						new LinkedList<ReplaceableAttribute>();
+				li.add(new ReplaceableAttribute("text", 
+						""+t+username+"|"+text+"~"+a.getValue(),true));
+				db.putAttributes(new PutAttributesRequest("posts", postID, li,
+						new UpdateCondition()));
 			}
 		}
 		return true;
@@ -268,14 +280,10 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//updates the timestamp for a user's latest activity
 	public void updateOnline(String username) {
 		long time = System.currentTimeMillis();
-		GetAttributesResult results = db.getAttributes(
-				new GetAttributesRequest("online",username));
-		List<Attribute> aList = results.getAttributes();
-		for (Attribute a : aList) {
-			if (a.getName().equals("timestamp")) {
-				a.setValue(String.valueOf(time));
-			}
-		}
+		List<ReplaceableAttribute> l = new LinkedList<ReplaceableAttribute>();
+		l.add(new ReplaceableAttribute("timestamp", ""+String.valueOf(time),true));
+		db.putAttributes(new PutAttributesRequest("online", username, l, 
+				new UpdateCondition()));
 	}
 	
 	//returns a list of a user's friends that are currently online
@@ -312,8 +320,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//given the querrying user and their query, returns a set of strings
 	//representing the possible usernames they could be looking for
-	public Set<String> getSuggestions(String username, String query) {
-		Set<String> sugg = new HashSet<String>();
+	public Map<String,String> getSuggestions(String username, String query) {
+		Map<String, String> map = new HashMap<String, String>();
+		Set<String> fr = new HashSet<String>();
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("users",username));
 		List<Attribute> list = results.getAttributes();
@@ -326,24 +335,32 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		String[] f = friends.split("~");
 		for(String s : f) {
 			if (s.toLowerCase().contains(query.toLowerCase())) {
-				sugg.add(s);
+				fr.add(s);
 			}
 		}
-		return sugg;
+		for (String s : f) {
+			List<Attribute> l = db.getAttributes(
+					new GetAttributesRequest("users",s)).getAttributes();
+			for (Attribute a : l) {
+				String ret = "";
+				if (a.getName().equals("firstName")) {
+					ret = ret + a.getValue() + " ";
+				} else if (a.getName().equals("lastName")) {
+					ret = a.getValue()+ret;
+				}
+				map.put(ret, s);
+			}
+		}
+		return map;
 	}
 	
 	//allows the user the change what their interests are
 	public boolean updateInterests(String username, String update) {
 		updateOnline(username);
-		GetAttributesResult results = db.getAttributes(
-				new GetAttributesRequest("users",username));
-		List<Attribute> aList = results.getAttributes();
-		for (Attribute a : aList) {
-			if (a.getName().equals("interests")) {
-				a.setValue(update);
-				return true;
-			}
-		}
+		List<ReplaceableAttribute> l = new LinkedList<ReplaceableAttribute>();
+		l.add(new ReplaceableAttribute("interests",""+update,true));
+		db.putAttributes(new PutAttributesRequest("users",username,l,
+				new UpdateCondition()));
 		return false;
 	}
 	

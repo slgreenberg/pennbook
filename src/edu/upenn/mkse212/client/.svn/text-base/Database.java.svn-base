@@ -15,6 +15,7 @@
 package edu.upenn.mkse212.client;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
@@ -59,7 +60,7 @@ public interface Database extends RemoteService {
 	
 	Integer incrementLogins(String username);
 	
-	Set<String> getSuggestions(String username, String query);
+	Map<String,String> getSuggestions(String username, String query);
 	
 	void visualizationFile(String username);
 	

@@ -34,9 +34,18 @@ public class FieldVerifier {
    * @return true if valid, false if invalid
    */
   public static boolean isValidName(String name) {
-    if (name == null) {
-      return false;
-    }
-    return name.length() > 3;
+	  if (name.toLowerCase().contains("drop table") || 
+			  name.toLowerCase().contains("select")) {return false; }
+	  return true;
   }
+  
+  public static boolean checkInput(String string) {
+	  if (string.toLowerCase().contains("~")) { return false;}
+	  if (string.toLowerCase().contains(";")) { return false;}
+	  if (string.toLowerCase().contains("<script")) {return false;}
+	  if (string.toLowerCase().contains("style=")) {return false;}
+	  if (string.toLowerCase().contains("drop table")) {return false;}
+	  return true;
+  }
+  
 }

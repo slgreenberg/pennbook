@@ -411,7 +411,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	public List<String> staticFriendReq(String username) {
 		List<String> ret = new ArrayList<String>();
 		List<Item> item = db.select(new SelectRequest("select friends " +
-				"from users where itemName = '"+username+"'")).getItems();
+				"from users where itemName() = '"+username+"'")).getItems();
 		StringBuffer buff = new StringBuffer();
 		buff.append("(");
 		for (Item i : item) {
@@ -419,7 +419,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				if (a.getName().equals("friends")) {
 					String[] arr = a.getValue().split("~");
 					for(String s : arr) {
-						buff.append("'"+s+"'");
+						buff.append("'"+s+"',");
 					}
 				}
 			}

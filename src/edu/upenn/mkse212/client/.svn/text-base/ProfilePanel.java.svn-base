@@ -40,7 +40,8 @@ public class ProfilePanel {
 	    final HTML info = new HTML("waiting...");	
 	    p.insertWest(info, 20, null);
 		
-		
+	 	final HTML wall = new HTML("Loading...");
+	    
 		// UPDATE INTERESTS BOX 
 		final DialogBox updateInfoBox = new DialogBox();
 		final Label directions = new Label ("Type in your interests to update your interests");
@@ -108,9 +109,11 @@ public class ProfilePanel {
 				if (userToUsername.containsKey(input)) {
 					String username = userToUsername.get(input);
 					displayProfileInfo(username, info);
+					displayWall(username, wall);
 				}
 				else if (userToUsername.containsValue(input)) {
 					displayProfileInfo(input, info);
+					displayWall(input, wall);
 				}
 				else {
 					parent.popupBox("Sorry", "Either you are not friends with the user you searched, or the user does not exist");
@@ -125,8 +128,7 @@ public class ProfilePanel {
 	    updateOracle(USERNAME, oracle);
 	    
 	    	    
-	 	final HTML wall = new HTML("Loading...");
-	 	p.add(wall);
+
 
 		RootPanel.get("rootPanelContainer").clear();
 		RootPanel.get("rootPanelContainer").add(p);
@@ -142,9 +144,9 @@ public class ProfilePanel {
 		});
 		
 		
-		
-		
-		
+
+	 	p.add(wall);
+			
 		displayProfileInfo(USERNAME, info);
 		displayWall(USERNAME, wall);
 
@@ -190,7 +192,7 @@ public class ProfilePanel {
 		parent.getDatabaseService().getWall(username,
 				new AsyncCallback<List<List<String>>>() {
 					public void onFailure(Throwable caught) {
-						parent.popupBox("RPC failure", "displayWall");
+						parent.popupBox("RPC failure", "getWall");
 					}
 					public void onSuccess(List<List<String>> results) {
 						Iterator<List<String>> i = results.iterator();
@@ -202,12 +204,12 @@ public class ProfilePanel {
 							System.out.println("comments " + result.get(3));
 							String postId = result.get(0);
 							System.out.println(postId);
-							Date date = new Date(postId);
-							String time = date.toString();
+							//Date date = new Date(postId);
+							//String time = date.toString();
 							String postedBy = result.get(1);
 							String post = result.get(2);
 							String comments = result.get(3);
-							wall.setHTML("At " + time + " "+ postedBy + " was all like " + post);
+							wall.setHTML("At "  + " "+ postedBy + " was all like " + post);
 						}
 						
 					}

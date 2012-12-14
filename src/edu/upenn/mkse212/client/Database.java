@@ -74,4 +74,10 @@ public interface Database extends RemoteService {
 	
 	List<List<String>> getFeed(String username);
 	
+	Map<String,String> nameUsername();
+	
+	Map<String,String> usernameName();
+	
+	Boolean isFriend(String username, String otherUsername);
+	
 }

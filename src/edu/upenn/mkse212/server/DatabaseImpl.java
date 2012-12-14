@@ -30,6 +30,8 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
+	private Map<String,String> nameUsername;
+	
 	private AmazonSimpleDBClient db;
 	
 	public DatabaseImpl() {
@@ -211,41 +213,45 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("posts",postID));
 		List<Attribute> l = results.getAttributes();
-		int count = 3;
 		ret.add(0, postID);
+		ret.add(1,"");
+		ret.add(2,"");
+		ret.add(3,"");
 		for (Attribute a : l) {
 			if (a.getName().equals("post")) {
+				ret.remove(2);
 				ret.add(2, a.getValue());
 			} else if (a.getName().equals("postedBy")) {
+				ret.remove(1);
 				ret.add(1, a.getValue());
 			} else if (a.getName().equals("comments")) {
-				ret.add(count, a.getValue());
-				count++;
+				ret.remove(3);
+				ret.add(3, a.getValue());
 			}
 		}
 		return ret;
 	}
 	
-	
+	//returns things twice
 	//returns a list of strings representing different posts on a user's
 	//wall including status updates and comments
 	public List<List<String>> getWall(String username) {
 		updateOnline(username);
 		SelectResult r = db.select(new SelectRequest("select postID from " +
-				"updates where postID is not null order by postID desc"));
+				"updates where itemName() = '"+username+"' and postID is not " +
+				"null order by postID desc"));
 		List<Item> item = r.getItems();
 		List<List<String>> ret = new LinkedList<List<String>>();
 		for (Item i : item) {
 			for (Attribute a : i.getAttributes()) {
 				if (a.getName().equals("postID")) {
-					System.out.println(a.getValue());
 					ret.add(getPostAndComment(a.getValue()));
 				}
 			}
 		}
 		return ret;
 	}
-	//TODO
+	
 	//not totally correct, probably have to do something a little different 
 	public List<List<String>> getFeed(String username) {
 		updateOnline(username);
@@ -437,6 +443,51 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
+	}
+	
+	public Map<String,String> nameUsername() {
+		nameUsername = new HashMap<String,String>();
+		SelectResult r = db.select(
+				new SelectRequest("select firstName, lastName from users"));
+		for (Item i : r.getItems()) {
+			String ret = "";
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("firstName")) {
+					ret = a.getValue() + " " + ret;
+				} else if (a.getName().equals("lastName")) {
+					ret = ret + a.getValue();
+				}
+			}
+			nameUsername.put(i.getName(), ret);
+		}
+		return nameUsername;
+	}
+	
+	public Map<String,String> usernameName() {
+		Map<String,String> map = new HashMap<String,String>();
+		for (String s : nameUsername.keySet()) {
+			map.put(nameUsername.get(s), s);
+		}
+		return map;
+	}
+	
+	
+	public Boolean isFriend(String username, String otherUsername) {
+		List<Item> item = db.select(new SelectRequest("select friends " +
+				"from users where itemName() = "+username)).getItems();
+		for (Item i : item) {
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("friends")) {
+					String[] f = a.getValue().split("~");
+					for (String s : f) {
+						if (otherUsername.equals(s)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	//returns an array containing all of the specified user's info

@@ -62,5 +62,14 @@ public interface DatabaseAsync {
 	void getFeed(String username, AsyncCallback<List<String>> callback) 
 			throws IllegalArgumentException;
 	
+	void nameUsername(AsyncCallback<Map<String,String>> callback) 
+			throws IllegalArgumentException;
+	
+	void usernameName(AsyncCallback<Map<String,String>> callback) 
+			throws IllegalArgumentException;
+	
+	void isFriend(String username, String otherUsername, 
+			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
+	
 
 }

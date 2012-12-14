@@ -41,8 +41,7 @@ public interface DatabaseAsync {
 	void getOnline(String username, AsyncCallback<List<String>> callback)
 			throws IllegalArgumentException;
 	
-	void getSuggestions(String username, String query,
-			AsyncCallback<Map<String,String>> callback)
+	void getSuggestions(String username, AsyncCallback<Map<String,String>> callback)
 			throws IllegalArgumentException;
 	
 	void getAllConnections(AsyncCallback<Boolean> callback) 

@@ -60,7 +60,7 @@ public interface Database extends RemoteService {
 	
 	Integer incrementLogins(String username);
 	
-	Map<String,String> getSuggestions(String username, String query);
+	Map<String,String> getSuggestions(String username);
 	
 	void visualizationFile(String username);
 	

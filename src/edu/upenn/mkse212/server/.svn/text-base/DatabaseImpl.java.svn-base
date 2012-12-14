@@ -169,13 +169,13 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		updateOnline(otherUsername);
 		String time = String.valueOf(System.currentTimeMillis());
 		List<ReplaceableAttribute> l = new ArrayList<ReplaceableAttribute>();
-		l.add(new ReplaceableAttribute("postedBy", ""+otherUsername,false));
-		l.add(new ReplaceableAttribute("timestamp", ""+time,false));
 		l.add(new ReplaceableAttribute("postID", ""+time,false));
 		db.putAttributes(new PutAttributesRequest("updates", username, l,
 				new UpdateCondition()));
 		
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
+
+		list.add(new ReplaceableAttribute("postedBy", ""+otherUsername,false));
 		list.add(new ReplaceableAttribute("post",""+text,false));
 		list.add(new ReplaceableAttribute("comments", "",true));
 		db.putAttributes(new PutAttributesRequest("posts", time, list,
@@ -211,10 +211,13 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("posts",postID));
 		List<Attribute> l = results.getAttributes();
-		int count = 1;
+		int count = 3;
+		ret.add(0, postID);
 		for (Attribute a : l) {
 			if (a.getName().equals("post")) {
-				ret.add(0, a.getValue());
+				ret.add(2, a.getValue());
+			} else if (a.getName().equals("postedBy")) {
+				ret.add(1, a.getValue());
 			} else if (a.getName().equals("comments")) {
 				ret.add(count, a.getValue());
 				count++;
@@ -228,18 +231,20 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//wall including status updates and comments
 	public List<List<String>> getWall(String username) {
 		updateOnline(username);
-		GetAttributesResult results = db.getAttributes(
-				new GetAttributesRequest("updates", username));
-		List<Attribute> aList = results.getAttributes();
+		SelectResult r = db.select(new SelectRequest("select postID from " +
+				"updates where postID is not null order by postID desc"));
+		List<Item> item = r.getItems();
 		List<List<String>> ret = new LinkedList<List<String>>();
-		for (Attribute a : aList) {
-			if (a.getName().equals("postID")) {
-				ret.add(getPostAndComment(a.getValue()));
+		for (Item i : item) {
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("postID")) {
+					ret.add(getPostAndComment(a.getValue()));
+				}
 			}
 		}
 		return ret;
 	}
-	
+	//TODO
 	//not totally correct, probably have to do something a little different 
 	public List<List<String>> getUpdates(String username) {
 		updateOnline(username);
@@ -320,9 +325,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//given the querrying user and their query, returns a set of strings
 	//representing the possible usernames they could be looking for
-	public Map<String,String> getSuggestions(String username, String query) {
+	public Map<String,String> getSuggestions(String username) {
 		Map<String, String> map = new HashMap<String, String>();
-		Set<String> fr = new HashSet<String>();
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("users",username));
 		List<Attribute> list = results.getAttributes();
@@ -333,23 +337,19 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			}
 		}
 		String[] f = friends.split("~");
-		for(String s : f) {
-			if (s.toLowerCase().contains(query.toLowerCase())) {
-				fr.add(s);
-			}
-		}
 		for (String s : f) {
 			List<Attribute> l = db.getAttributes(
 					new GetAttributesRequest("users",s)).getAttributes();
+			String ret = "";
 			for (Attribute a : l) {
-				String ret = "";
 				if (a.getName().equals("firstName")) {
-					ret = ret + a.getValue() + " ";
+					ret = a.getValue() + " " + ret;
 				} else if (a.getName().equals("lastName")) {
-					ret = a.getValue()+ret;
+					ret = ret+a.getValue();
 				}
-				map.put(ret, s);
+				
 			}
+			map.put(ret, s);
 		}
 		return map;
 	}

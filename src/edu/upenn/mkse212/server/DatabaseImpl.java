@@ -246,38 +246,54 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	}
 	//TODO
 	//not totally correct, probably have to do something a little different 
-	public List<List<String>> getUpdates(String username) {
+	public List<List<String>> getFeed(String username) {
 		updateOnline(username);
 		List<List<String>> ret = new LinkedList<List<String>>();
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("updates",username));
 		List<Attribute> l = results.getAttributes();
 		List<String> friends = new ArrayList<String>();
+		StringBuffer buff = new StringBuffer();
+		buff.append("(");
 		for(Attribute a : l) {
 			if (a.getName().equals("friends")) {
 				String[] f = a.getValue().split("~");
 				for(String s : f) {
 					friends.add(s);
+					buff.append("'"+s+"',");
 				}
 			}
 		}
-		SelectResult sr = db.select(new SelectRequest("select userID, postedBy from updates"));
+		buff.deleteCharAt(buff.length()-1);
+		buff.append(")");
+		String string = buff.toString();
+		SelectResult sr = db.select(new SelectRequest("select userID from" +
+				" updates where every(itemName()) in "+string+", userID is " +
+						"not null order by userID desc"));
 		List<Item> item = sr.getItems(); 
 		for (Item i : item) {
-			String postID = "";
+			LinkedList<String> postIDs = new LinkedList<String>();
 			for (Attribute a : i.getAttributes()) {
 				if (a.getName().equals("postID")) {
-					postID = a.getValue();
+					postIDs.addFirst(a.getValue());
 				}
-				if (a.getName().equals("postedBy")) {
-					if (friends.contains(i.getName())
-							&&friends.contains(a.getValue())) {
-						ret.add(getPostAndComment(postID));
+				for (String s : postIDs) {
+					List<Attribute> alist = db.getAttributes(
+						new GetAttributesRequest("posts",s)).getAttributes();
+					List<String> lis = new LinkedList<String>();
+					lis.add(0,s);
+					for (Attribute a2 : alist) {
+						if (a2.getName().equals("postedBy")) {
+							lis.add(1,a2.getValue());
+						} else if (a2.getName().equals("post")) {
+							lis.add(2,a2.getValue());
+						} else if (a2.getName().equals("comments")) {
+							lis.add(3,a2.getValue());
+						}
 					}
 				}
 			}
 		} 
-		//want friends to contain both postedTo and postedBy
 		return ret;
 	}
 	

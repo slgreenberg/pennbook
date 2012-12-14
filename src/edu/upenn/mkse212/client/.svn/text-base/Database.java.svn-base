@@ -72,4 +72,6 @@ public interface Database extends RemoteService {
 	
 	List<String> getPostAndComment(String postID);
 	
+	List<List<String>> getFeed(String username);
+	
 }

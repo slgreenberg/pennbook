@@ -1,12 +1,12 @@
 package edu.upenn.mkse212.client;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.dom.client.Text;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -114,6 +114,20 @@ public class ProfilePanel {
 	    	}
 	    });
 	    
+	    final Button visualize = new Button("VISUALIZE!", new ClickHandler() {
+	    	public void onClick(ClickEvent sender) {
+	    		parent.getDatabaseService().graphJSON(USERNAME,
+						new AsyncCallback<String>() {
+							public void onFailure(Throwable caught) {
+								parent.popupBox("RPC failure", "Visualize");
+							}
+							public void onSuccess(String results) {
+								parent.getFriendViewer().drawNodeAndNeighbors(USERNAME);
+							}
+						});		
+	    	}
+	    });
+	    
 	    MultiWordSuggestOracle oracle = new MultiWordSuggestOracle(",");
 	    final SuggestBox searchBox = new SuggestBox(oracle);
 		populateMaps(oracle);
@@ -121,6 +135,7 @@ public class ProfilePanel {
 	    buttonPanel.add(feed);
 	    buttonPanel.add(profile);
 	    buttonPanel.add(signout);
+	    buttonPanel.add(visualize);
 	    buttonPanel.add(updateInfo);
 	    buttonPanel.add(searchBox);
 	    
@@ -146,9 +161,14 @@ public class ProfilePanel {
 	    buttonPanel.add(searchButton);
 	    p.insertNorth(buttonPanel, 5, null);
 	    
-	    VerticalPanel onlineFriends = new VerticalPanel();
-	    p.insertEast(onlineFriends, 20, null);
+	    VerticalPanel friendReccs = new VerticalPanel();
+	    p.insertEast(friendReccs, 20, null);
 	    
+	    VerticalPanel onlineFriends = new VerticalPanel();
+	    p.insertEast(onlineFriends, 20, friendReccs);
+	    
+
+	    displayFriendReccs(friendReccs);
 	    displayOnlineFriends(onlineFriends);
 	    
 	    
@@ -184,7 +204,7 @@ public class ProfilePanel {
 
 
 	}
-		
+
 	public void displayOnlineFriends(final VerticalPanel onlineFriends) {
 		parent.getDatabaseService().getOnline(USERNAME,
 				new AsyncCallback<Set<String>>() {
@@ -289,8 +309,14 @@ public class ProfilePanel {
 							String wallString = "";
 							HTML wall = new HTML();
 							final String postId = result.get(0);
-							Date date = new Date(System.currentTimeMillis());
-							String time = date.toString();
+
+							String time = "";
+							if (postId != null) {
+								Long dateTime = Long.parseLong(postId);
+								Date date = new Date(dateTime);
+								time = date.toString();
+							}
+
 							final String postedBy = result.get(1);
 							String post = result.get(2);
 							String commentString = result.get(3);
@@ -435,20 +461,6 @@ public class ProfilePanel {
 					public void onSuccess(List<List<String>> results) {
 						info.setVisible(false);
 						vpwall.clear();
-						final VerticalPanel holder = new VerticalPanel();
-						final TextBox postBox = new TextBox();
-						final Button postButton = new Button("POST THIS SWEET THANG!");
-						postButton.addClickHandler(new ClickHandler() {
-							public void onClick(ClickEvent event) {
-								if (!postBox.getText().equals("")) {
-									addPost(USERNAME, friendUserName, postBox.getText(), vpwall, info);
-								}
-							}
-						});
-						holder.add(postBox);
-						holder.add(postButton);
-						vpwall.add(holder);
-						
 						for (List<String> result : results) {
 							String wallString = "";
 							HTML wall = new HTML();
@@ -457,18 +469,27 @@ public class ProfilePanel {
 							Date date = new Date(System.currentTimeMillis());
 							String time = date.toString();
 							final String postedBy = result.get(1);
-							String postedTo = result.get(2);
+							String namePostedBy = usernameToName.get(postedBy);
+							final String postedTo = result.get(2);
+							String namePostedTo = usernameToName.get(postedTo);
 							String post = result.get(3);
 							String commentString = result.get(4);
-							final Anchor poster = new Anchor(usernameToName.get(postedBy));
+							final Anchor poster = new Anchor(namePostedBy);
 							poster.addClickHandler(new ClickHandler() {
 								public void onClick(ClickEvent event) {
 									displayProfileInfo(postedBy, info);
 									displayWall(postedBy, vpwall, info, addFriendButton);
 								}
 							});
+							final Anchor postee = new Anchor(namePostedTo);
+							poster.addClickHandler(new ClickHandler() {
+								public void onClick(ClickEvent event) {
+									displayProfileInfo(postedBy, info);
+									displayWall(postedTo, vpwall, info, addFriendButton);
+								}
+							});
 							wallString +=
-									"<br /><strong>" + poster + "</strong>" + " > " + "<strong>" + postedTo + "<br />" +
+									"<br /><strong>" + poster + "</strong>" + " > " + "<strong>" + postee + "<br />" +
 									"<i>" + time + "</i><br />" +
 									"<span>" + post + "</span><br />";
 							if (!commentString.equals("")) {
@@ -521,6 +542,27 @@ public class ProfilePanel {
 					}
 				});
 		
+	}
+	
+	
+	private void displayFriendReccs(final VerticalPanel friendReccs) {
+		parent.getDatabaseService().staticFriendReq(USERNAME,
+		new AsyncCallback<List<String>>() {
+			public void onFailure(Throwable caught) {
+				parent.popupBox("RPC failure", "staticFriendReq");
+			}
+			public void onSuccess(List<String> results) {
+				HTML friends = new HTML();
+				String friendRecc = "We think you should be friends with: <br />";
+				for (String result : results) {
+					friendRecc += result + "<br />";
+				}
+				friends.setHTML(friendRecc);
+				friendReccs.add(friends);
+				
+			}
+		});
+	
 	}
 	
 }

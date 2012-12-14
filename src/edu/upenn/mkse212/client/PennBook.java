@@ -1,21 +1,17 @@
 package edu.upenn.mkse212.client;
 
-import edu.upenn.mkse212.shared.FieldVerifier;
+import java.io.IOException;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+
+import edu.upenn.mkse212.ParseInputGraph;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -40,6 +36,8 @@ public class PennBook implements EntryPoint {
   private LoginPanel loginPanel;
   private CreateAccountPanel createAccountPanel;
   private String handle;
+  private FriendViewer friendViewer;
+  
   protected DatabaseAsync getDatabaseService() {
 	  return databaseService;
   }
@@ -52,11 +50,16 @@ public class PennBook implements EntryPoint {
   protected CreateAccountPanel getCreateAccountPanel() {
 	  return createAccountPanel;
   }
+  protected FriendViewer getFriendViewer() {
+	  return friendViewer;
+  }
+  
   
   public void onModuleLoad() {
 	  wallPanel = new ProfilePanel(this);
 	  loginPanel = new LoginPanel(this);
 	  createAccountPanel = new CreateAccountPanel(this);
+	  friendViewer = new FriendViewer(this);
 	  loginPanel.display();
   }
   

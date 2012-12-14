@@ -410,8 +410,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	public List<String> staticFriendReq(String username) {
 		List<String> ret = new ArrayList<String>();
-		List<Item> item = db.select(new SelectRequest("select friends " +
-				"from users where itemName() = '"+username+"'")).getItems();
+		//List<Item> item = db.select(new SelectRequest("select friends " +
+		//		"from users where itemName() = '"+username+"'")).getItems();
+		List<Item> item = db.select(new SelectRequest("select friends from users")).getItems();
 		StringBuffer buff = new StringBuffer();
 		buff.append("(");
 		for (Item i : item) {
@@ -428,12 +429,14 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		buff.append(")");
 		String string = buff.toString();
 		List<Item> il = db.select(new SelectRequest("select friend from " +
-				"friends where itemName() in "+string+" and friend not in " +
-						""+string)).getItems();
+				"friends where itemName() in "+string)).getItems();
 		for (Item i : il) {
 			for (Attribute a : i.getAttributes()) {
 				if (a.getName().equals("friend")) {
-					ret.add(a.getValue());
+					if (!string.contains(a.getValue()) 
+							&& !username.equals(a.getValue())) {
+						ret.add(a.getValue());
+					}
 				}
 			}
 		}

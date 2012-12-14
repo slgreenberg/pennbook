@@ -33,12 +33,16 @@ import com.google.gwt.user.client.ui.TextBox;
  */
 public class FriendViewer implements EntryPoint {
 	
+	PennBook parent;
 
 	//NEED TO DEFINE WHO THE USER IS
 	private String username;
 	private String ret;
 	private JavaScriptObject graph;
 	
+	public FriendViewer(PennBook theParent) {
+		this.parent = theParent;
+	}
 	//creates a string to be parsed into json of a node and all of
 	//its respective children. if it is the first time the graph is 
 	//created, it creates a new graph, otherwise it updates the current

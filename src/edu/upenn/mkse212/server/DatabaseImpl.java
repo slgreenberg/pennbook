@@ -110,13 +110,17 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
 		List<Attribute> attributeList = result.getAttributes();
+		StringBuffer buff = new StringBuffer();
 		String friend = "";
 		Boolean check1 = false;
 		Boolean check2 = false;
 		for (Attribute a : attributeList) {
 			if (a.getName().equals("friends")) {
-				friend+=a.getValue()+"~";
-				friend+=otherUsername;
+				buff.append(otherUsername+"~"+a.getValue());
+				buff.deleteCharAt(buff.length()-1);
+				//friend+=a.getValue()+"~";
+				//friend+=otherUsername;
+				friend = buff.toString();
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
 				li.add(new ReplaceableAttribute("friends",friend,true));
@@ -128,11 +132,15 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		result = db.getAttributes(new GetAttributesRequest("users", 
 				otherUsername));
 		attributeList = result.getAttributes();
+		StringBuffer b = new StringBuffer();
 		String f = "";
 		for (Attribute a : attributeList) {
 			if (a.getName().equals("friends")) {
-				f+=a.getValue()+"~";
-				f+=username;
+				b.append(username+"~"+a.getValue());
+				buff.deleteCharAt(buff.length()-1);
+				//f+=a.getValue()+"~";
+				//f+=username;
+				f = b.toString();
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
 				li.add(new ReplaceableAttribute("friends",friend,true));
@@ -192,13 +200,12 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("posts",postID));
 		List<Attribute> l = result.getAttributes();
-		String t = "";
 		for(Attribute a : l) {
 			if (a.getName().equals("comments")) {
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
-				li.add(new ReplaceableAttribute("text", 
-						""+t+username+"|"+text+"~"+a.getValue(),true));
+				li.add(new ReplaceableAttribute("comments", 
+						""+username+"|"+text+"~"+a.getValue(),true));
 				db.putAttributes(new PutAttributesRequest("posts", postID, li,
 						new UpdateCondition()));
 			}
@@ -257,7 +264,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		updateOnline(username);
 		List<List<String>> ret = new LinkedList<List<String>>();
 		GetAttributesResult results = db.getAttributes(
-				new GetAttributesRequest("updates",username));
+				new GetAttributesRequest("users",username));
 		List<Attribute> l = results.getAttributes();
 		List<String> friends = new ArrayList<String>();
 		StringBuffer buff = new StringBuffer();
@@ -274,9 +281,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		buff.deleteCharAt(buff.length()-1);
 		buff.append(")");
 		String string = buff.toString();
-		SelectResult sr = db.select(new SelectRequest("select userID from" +
-				" updates where every(itemName()) in "+string+" and userID is " +
-						"not null order by userID desc"));
+		SelectResult sr = db.select(new SelectRequest("select postID from" +
+				" updates where itemName() in "+string+" and postID is " +
+						"not null order by postID desc",true));
 		List<Item> item = sr.getItems(); 
 		for (Item i : item) {
 			LinkedList<String> postIDs = new LinkedList<String>();
@@ -284,29 +291,32 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				if (a.getName().equals("postID")) {
 					postIDs.addFirst(a.getValue());
 				}
+			}
 				for (String s : postIDs) {
 					List<Attribute> alist = db.getAttributes(
 						new GetAttributesRequest("posts",s)).getAttributes();
 					List<String> lis = new LinkedList<String>();
 					lis.add(0,s);
 					lis.add(1,"");
-					lis.add(2,"");
+					lis.add(2,i.getName());
 					lis.add(3,"");
+					lis.add(4,"");
 					for (Attribute a2 : alist) {
 						if (a2.getName().equals("postedBy")) {
 							lis.remove(1);
 							lis.add(1,a2.getValue());
 						} else if (a2.getName().equals("post")) {
-							lis.remove(2);
-							lis.add(2,a2.getValue());
-						} else if (a2.getName().equals("comments")) {
 							lis.remove(3);
 							lis.add(3,a2.getValue());
+						} else if (a2.getName().equals("comments")) {
+							lis.remove(4);
+							lis.add(4,a2.getValue());
 						}
 					}
+					ret.add(lis);
 				}
-			}
 		} 
+		System.out.println(ret.toString());
 		return ret;
 	}
 	

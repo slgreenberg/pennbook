@@ -1,7 +1,7 @@
 10
 
 dir
-1851
+1853
 svn://ds01.seas.upenn.edu:10212/MKSE212-F12/projects/team11/PennBook/war/WEB-INF
 svn://ds01.seas.upenn.edu:10212
 
@@ -25,9 +25,6 @@ susangr
 
 
 5ad26087-e723-4249-8126-bead7c82311c
-
-lib
-dir
 
 web.xml
 file
@@ -64,5 +61,8 @@ susangr
 736
 
 deploy
+dir
+
+lib
 dir
 

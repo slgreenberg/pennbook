@@ -203,7 +203,7 @@ public class ProfilePanel {
 	}
 	
 	public void displayWall(String username, final VerticalPanel vpwall) {
-		parent.getDatabaseService().getWall(username,
+		parent.getDatabaseService().getFeed(username,
 				new AsyncCallback<List<List<String>>>() {
 					public void onFailure(Throwable caught) {
 						parent.popupBox("RPC failure", "getWall");
@@ -213,7 +213,7 @@ public class ProfilePanel {
 						final HTML wall = new HTML();
 						final VerticalPanel holder = new VerticalPanel();
 						final TextArea commentBox = new TextArea();
-						commentBox.setVisibleLines(3);
+						commentBox.setVisibleLines(1);
 						final Button commentButton = new Button("POST THIS SWEET THANG!");
 						commentButton.addClickHandler(new ClickHandler() {
 							public void onClick(ClickEvent event) {
@@ -229,9 +229,7 @@ public class ProfilePanel {
 						
 						String wallString = "";
 						for (List<String> result : results) {
-							System.out.println(result.toString());
 							String postId = result.get(0);
-							System.out.println(postId);
 							Date date = new Date(System.currentTimeMillis());
 							String time = date.toString();
 							String postedBy = result.get(1);

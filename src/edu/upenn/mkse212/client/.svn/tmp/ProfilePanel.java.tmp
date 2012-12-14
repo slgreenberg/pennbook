@@ -229,6 +229,7 @@ public class ProfilePanel {
 						
 						String wallString = "";
 						for (List<String> result : results) {
+							System.out.println(result.toString());
 							String postId = result.get(0);
 							System.out.println(postId);
 							Date date = new Date(System.currentTimeMillis());
@@ -236,6 +237,16 @@ public class ProfilePanel {
 							String postedBy = result.get(1);
 							String post = result.get(2);
 							String comments = result.get(3);
+<<<<<<< .mine
+							wall.setHTML("At " + time + " "+ postedBy + " was all like " + post);
+							/*
+							wall.setHTML(
+								"<strong>" + postedBy + "</strong>" + "<br />" +
+									
+							);
+							*/
+							
+=======
 							wallString +=
 								"<br /><div>" + 
 									"<strong>" + postedBy + "</strong>" + "<br />" +
@@ -243,6 +254,7 @@ public class ProfilePanel {
 									"<span>" + post + "</span>" +
 								"</div>"
 							;	
+>>>>>>> .r1851
 						}
 						wall.setHTML(wallString);
 						

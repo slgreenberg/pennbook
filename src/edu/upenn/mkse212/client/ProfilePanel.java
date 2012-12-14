@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -27,22 +28,24 @@ public class ProfilePanel {
 	PennBook parent;
 	Map<String, String> userToUsername;
 	String friendUserName;
+	String USERNAME;
 	
 	public ProfilePanel(PennBook theParent) {
 		this.parent = theParent;
 	}
 	void display(String username) {
-		final String USERNAME = username;
+		USERNAME = username;
 		final Label label = new Label("waiting...");
 		
 		DockLayoutPanel p = new DockLayoutPanel(Unit.EM);
 		p.setHeight("1000px");
 		p.setWidth("1000px");
 		
-	    final HTML info = new HTML("waiting...");	
+	    final HTML info = new HTML("Loading...");	
 	    p.insertWest(info, 20, null);
-		
-	 	final HTML wall = new HTML("Loading...");
+
+	 	final VerticalPanel vpwall = new VerticalPanel();
+
 	    
 		// UPDATE INTERESTS BOX 
 		final DialogBox updateInfoBox = new DialogBox();
@@ -61,7 +64,7 @@ public class ProfilePanel {
 								public void onSuccess(Boolean success) {
 									updateInfoBox.hide();
 									displayProfileInfo(USERNAME, info);
-									displayWall(USERNAME, wall);
+									displayWall(USERNAME, vpwall);
 								}
 					});
 				}
@@ -89,7 +92,7 @@ public class ProfilePanel {
 	    final Button profile = new Button("MY PROFILE", new ClickHandler() {
 	    	public void onClick(ClickEvent sender) {
 	    		displayProfileInfo(USERNAME, info);
-	    		displayWall(USERNAME, wall);
+	    		displayWall(USERNAME, vpwall);
 	    	}
 	    });
 	    final Button signout = new Button("SIGN OUT", new ClickHandler() {
@@ -112,11 +115,11 @@ public class ProfilePanel {
 				if (userToUsername.containsKey(input)) {
 					String username = userToUsername.get(input);
 					displayProfileInfo(username, info);
-					displayWall(username, wall);
+					displayWall(username, vpwall);
 				}
 				else if (userToUsername.containsValue(input)) {
 					displayProfileInfo(input, info);
-					displayWall(input, wall);
+					displayWall(input, vpwall);
 				}
 				else {
 					parent.popupBox("Sorry", "Either you are not friends with the user you searched, or the user does not exist");
@@ -155,10 +158,10 @@ public class ProfilePanel {
 		// NEED AN IF STATEMENT FOR IF TO DISPLAY WALL OR FRIEND BUTTON.
 		
 		// this must be last!
-	 	p.add(wall);
+	 	p.add(vpwall);
 			
 		displayProfileInfo(USERNAME, info);
-		displayWall(USERNAME, wall);
+		displayWall(USERNAME, vpwall);
 
 
 	}
@@ -199,14 +202,32 @@ public class ProfilePanel {
 					});
 	}
 	
-	public void displayWall(String username, final HTML wall) {
+	public void displayWall(String username, final VerticalPanel vpwall) {
 		parent.getDatabaseService().getWall(username,
 				new AsyncCallback<List<List<String>>>() {
 					public void onFailure(Throwable caught) {
 						parent.popupBox("RPC failure", "getWall");
 					}
 					public void onSuccess(List<List<String>> results) {
-						System.out.println("LENGTH " + results.size());
+						vpwall.clear();
+						final HTML wall = new HTML();
+						final VerticalPanel holder = new VerticalPanel();
+						final TextArea commentBox = new TextArea();
+						commentBox.setVisibleLines(3);
+						final Button commentButton = new Button("POST THIS SWEET THANG!");
+						commentButton.addClickHandler(new ClickHandler() {
+							public void onClick(ClickEvent event) {
+								if (!commentBox.getText().equals("")) {
+									addPost(USERNAME, friendUserName, commentBox.getText(), wall, vpwall);
+								}
+							}
+						});
+						holder.add(commentBox);
+						holder.add(commentButton);
+						vpwall.add(holder);
+						vpwall.add(wall);
+						
+						String wallString = "";
 						for (List<String> result : results) {
 							System.out.println(result.toString());
 							String postId = result.get(0);
@@ -216,15 +237,16 @@ public class ProfilePanel {
 							String postedBy = result.get(1);
 							String post = result.get(2);
 							String comments = result.get(3);
-							wall.setHTML("At " + time + " "+ postedBy + " was all like " + post);
-							/*
-							wall.setHTML(
-								"<strong>" + postedBy + "</strong>" + "<br />" +
-									
-							);
-							*/
-							
+
+							wallString +=
+								"<br /><div>" + 
+									"<strong>" + postedBy + "</strong>" + "<br />" +
+									"<i>" + time + "</i><br />" +
+									"<span>" + post + "</span>" +
+								"</div>"
+							;	
 						}
+						wall.setHTML(wallString);
 						
 					}
 				});
@@ -242,6 +264,19 @@ public class ProfilePanel {
 							addFriendButton.setHTML("FRIENDED, I hope they say yes!");
 							addFriendButton.setEnabled(false);
 						}
+					}
+				});
+	}
+	
+	private void addPost(final String username, String friendUserName, String text, final HTML wall, final VerticalPanel vpwall) {
+		parent.getDatabaseService().addPost(friendUserName, username, text,
+				new AsyncCallback<Boolean>() {
+					public void onFailure(Throwable caught) {
+						parent.popupBox("RPC failure", "getWall");
+					}
+					public void onSuccess(Boolean results) {
+						// parent.popupBox("POST", "you posted successfully");
+						displayWall(username, vpwall);
 					}
 				});
 	}

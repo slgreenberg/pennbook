@@ -241,11 +241,11 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				"updates where itemName() = '"+username+"' and postID is not " +
 				"null order by postID desc",true));
 		List<Item> item = r.getItems();
-		List<List<String>> ret = new LinkedList<List<String>>();
+		LinkedList<List<String>> ret = new LinkedList<List<String>>();
 		for (Item i : item) {
 			for (Attribute a : i.getAttributes()) {
 				if (a.getName().equals("postID")) {
-					ret.add(getPostAndComment(a.getValue()));
+					ret.addFirst(getPostAndComment(a.getValue()));
 				}
 			}
 		}
@@ -395,7 +395,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	//creates the file for adsorption
 	//gets all friendships from all users
-	//TODO add network and interests
+	//TODO interests
 	public void getAllConnections() {
 		try {
 			BufferedWriter buff = new BufferedWriter(new FileWriter("adsorption.txt"));
@@ -408,6 +408,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 					if(a.getName().equals("friends")) {
 						buff.write(i.getName()+"\t"+a.getValue());
 						buff.newLine();
+					} else if (a.getName().equals("network")) {
+						buff.write(i.getName()+"\t"+a.getValue());
 					}
 				}
 			}

@@ -71,7 +71,6 @@ public class CreateAccountPanel {
 								if (!result.booleanValue()) {
 									parent.popupBox("Error", "This username is already taken.");
 								} else {
-									//TODO same as in loginPanel, change getWallPanel
 									parent.getWallPanel().display(username);
 								}
 							}

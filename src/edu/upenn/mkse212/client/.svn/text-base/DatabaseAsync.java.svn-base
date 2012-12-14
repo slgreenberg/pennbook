@@ -38,7 +38,8 @@ public interface DatabaseAsync {
 	
 	void updateInterests(String username, String update,
 			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
-	void getOnline(String username, AsyncCallback<List<String>> callback)
+	
+	void getOnline(String username, AsyncCallback<Set<String>> callback)
 			throws IllegalArgumentException;
 	
 	void getSuggestions(String username, AsyncCallback<Map<String,String>> callback)
@@ -47,8 +48,8 @@ public interface DatabaseAsync {
 	void getAllConnections(AsyncCallback<Boolean> callback) 
 			throws IllegalArgumentException;
 	
-	void visualizationFile(String username, AsyncCallback<Boolean> callback)
-		throws IllegalArgumentException;
+	//void visualizationFile(String username, AsyncCallback<Boolean> callback)
+		//throws IllegalArgumentException;
 	
 	void getNetwork(String username, AsyncCallback<String> callback)
 		throws IllegalArgumentException;
@@ -75,6 +76,9 @@ public interface DatabaseAsync {
 			throws IllegalArgumentException;
 	
 	void staticFriendReq(String username, AsyncCallback<List<String>> callback)
+			throws IllegalArgumentException;
+	
+	void graphJSON(String username, AsyncCallback<String> callback) 
 			throws IllegalArgumentException;
 	
 

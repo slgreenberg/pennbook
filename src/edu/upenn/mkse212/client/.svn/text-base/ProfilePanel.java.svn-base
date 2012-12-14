@@ -3,6 +3,8 @@ package edu.upenn.mkse212.client;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Text;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -45,7 +47,7 @@ public class ProfilePanel {
 		final Label label = new Label("waiting...");
 		
 		DockLayoutPanel p = new DockLayoutPanel(Unit.EM);
-		p.setHeight("1000px");
+		p.setHeight("8000px");
 		p.setWidth("1000px");
 		
 	    final HTML info = new HTML("Loading...");	
@@ -97,7 +99,7 @@ public class ProfilePanel {
 				});	
 	    final Button feed = new Button("FEED", new ClickHandler() {
 	    	public void onClick(ClickEvent sender) {
-	    		displayFeed(USERNAME);
+	    		displayFeed(USERNAME, vpwall, info);
 	    	}
 	    });
 	    final Button profile = new Button("MY PROFILE", new ClickHandler() {
@@ -145,7 +147,7 @@ public class ProfilePanel {
 	    p.insertNorth(buttonPanel, 5, null);
 	    
 	    VerticalPanel onlineFriends = new VerticalPanel();
-	    p.insertEast(onlineFriends, 10, null);
+	    p.insertEast(onlineFriends, 20, null);
 	    
 	    displayOnlineFriends(onlineFriends);
 	    
@@ -183,19 +185,20 @@ public class ProfilePanel {
 
 	}
 		
-	public void displayOnlineFriends(VerticalPanel onlineFriends) {
+	public void displayOnlineFriends(final VerticalPanel onlineFriends) {
 		parent.getDatabaseService().getOnline(USERNAME,
-				new AsyncCallback<List<String>>() {
+				new AsyncCallback<Set<String>>() {
 					public void onFailure(Throwable caught) {
 						parent.popupBox("RPC failure", "getOnline");
 					}
-					public void onSuccess(List<String> results) {
+					public void onSuccess(Set<String> results) {
 						HTML friends = new HTML();
-						String html = "";
+						String html = "These friends are currently online: <br />";
 						for (String result : results) {
 							html += result + "<br />";
 						}
 						friends.setHTML(html);
+						onlineFriends.add(friends);
 					}
 				});
 		
@@ -226,6 +229,7 @@ public class ProfilePanel {
 							parent.popupBox("RPC failure", "getInfo");
 						}
 						public void onSuccess(String[] results) {
+							info.setVisible(true);
 							friendUserName = username;
 							info.setHTML("NAME: " + results[0] + " " + results[1] + " <br />" + 
 									     "USERNAME: " + results[6] + " <br />" + 
@@ -245,9 +249,10 @@ public class ProfilePanel {
 					}
 					@Override
 					public void onSuccess(Boolean result) {
-						if (result) {
+						if (result || USERNAME.equals(username)) {
 							reallyDisplayWall(username, vpwall, info);
 						} else {
+							vpwall.clear();
 							vpwall.add(addFriendButton);
 						}
 						
@@ -294,6 +299,7 @@ public class ProfilePanel {
 							System.out.println(usernameToName.get(postedBy));
 							poster.addClickHandler(new ClickHandler() {
 								public void onClick(ClickEvent event) {
+									System.out.println("AM I HERE?");
 									displayProfileInfo(postedBy, info);
 									displayWall(postedBy, vpwall, info, addFriendButton);
 								}
@@ -393,7 +399,7 @@ public class ProfilePanel {
 				});
 	}
 	
-	private void addPost(final String username, String friendUserName, String text, final VerticalPanel vpwall, final HTML info) {
+	private void addPost(final String username, final String friendUserName, String text, final VerticalPanel vpwall, final HTML info) {
 		parent.getDatabaseService().addPost(friendUserName, username, text,
 				new AsyncCallback<Boolean>() {
 					public void onFailure(Throwable caught) {
@@ -401,7 +407,7 @@ public class ProfilePanel {
 					}
 					public void onSuccess(Boolean results) {
 						// parent.popupBox("POST", "you posted successfully");
-						displayWall(username, vpwall, info, addFriendButton);
+						displayWall(friendUserName, vpwall, info, addFriendButton);
 					}
 				});
 	}
@@ -419,8 +425,100 @@ public class ProfilePanel {
 				});
 	}
 	
-	private void displayFeed(String username) {
-		// TODO Auto-generated method stub
+	private void displayFeed(String username, final VerticalPanel vpwall, final HTML info) {
+		parent.getDatabaseService().getFeed(username,
+				new AsyncCallback<List<List<String>>>() {
+					public void onFailure(Throwable caught) {
+						parent.popupBox("RPC failure", "getFeed");
+					}
+					public void onSuccess(List<List<String>> results) {
+						info.setVisible(false);
+						vpwall.clear();
+						final VerticalPanel holder = new VerticalPanel();
+						final TextBox postBox = new TextBox();
+						final Button postButton = new Button("POST THIS SWEET THANG!");
+						postButton.addClickHandler(new ClickHandler() {
+							public void onClick(ClickEvent event) {
+								if (!postBox.getText().equals("")) {
+									addPost(USERNAME, friendUserName, postBox.getText(), vpwall, info);
+								}
+							}
+						});
+						holder.add(postBox);
+						holder.add(postButton);
+						vpwall.add(holder);
+						
+						for (List<String> result : results) {
+							String wallString = "";
+							HTML wall = new HTML();
+							final String postId = result.get(0);
+							System.out.println(postId);
+							Date date = new Date(System.currentTimeMillis());
+							String time = date.toString();
+							final String postedBy = result.get(1);
+							String postedTo = result.get(2);
+							String post = result.get(3);
+							String commentString = result.get(4);
+							final Anchor poster = new Anchor(usernameToName.get(postedBy));
+							poster.addClickHandler(new ClickHandler() {
+								public void onClick(ClickEvent event) {
+									displayProfileInfo(postedBy, info);
+									displayWall(postedBy, vpwall, info, addFriendButton);
+								}
+							});
+							wallString +=
+									"<br /><strong>" + poster + "</strong>" + " > " + "<strong>" + postedTo + "<br />" +
+									"<i>" + time + "</i><br />" +
+									"<span>" + post + "</span><br />";
+							if (!commentString.equals("")) {
+								String[] comments = commentString.split("~~");
+								for (String comment : comments) {
+									String[] commentFeatures = comment.split("~");
+									final String commenter = commentFeatures[0];
+									String commentText = commentFeatures[1];
+									final Anchor posterCommenter = new Anchor(usernameToName.get(commenter));
+									posterCommenter.addClickHandler(new ClickHandler() {
+										public void onClick(ClickEvent event) {
+											displayProfileInfo(commenter, info);
+											displayWall(commenter, vpwall, info, addFriendButton);
+										}
+									});
+									wallString +=
+										"<div style='margin-left:15px'>" +
+											"<strong>" + posterCommenter + "</strong>" + "<br />" +
+											"<span>" + commentText + "</span><br />"+
+										"</div>";
+								}
+							}
+							wall.setHTML(wallString);
+							vpwall.add(wall);
+							final TextBox commentBox = new TextBox();
+							commentBox.setText("Write a comment...");
+							commentBox.addClickListener(new ClickListener() {
+								public void onClick(Widget sender) {
+									commentBox.setText("");
+									
+								}
+							});
+							commentBox.addBlurHandler(new BlurHandler() {
+								public void onBlur(BlurEvent event) {
+									if (commentBox.getText().equals("")) {
+										commentBox.setText("Write a comment...");
+									}	
+								}
+							});
+							final Button commentButton = new Button("Comment");
+							commentButton.addClickHandler(new ClickHandler() {
+								public void onClick(ClickEvent event) {
+									addComment(USERNAME, commentBox.getText(), postId, vpwall, info);
+									
+								}
+							});
+							vpwall.add(commentBox);
+							vpwall.add(commentButton);
+						}
+					}
+				});
 		
 	}
 	

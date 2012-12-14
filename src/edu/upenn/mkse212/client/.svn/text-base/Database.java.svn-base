@@ -54,7 +54,7 @@ public interface Database extends RemoteService {
 	
 	boolean updateInterests(String username, String update);
 	
-	List<String> getOnline(String username);
+	Set<String> getOnline(String username);
 	
 	List<List<String>> getWall(String username);
 	
@@ -62,7 +62,7 @@ public interface Database extends RemoteService {
 	
 	Map<String,String> getSuggestions(String username);
 	
-	void visualizationFile(String username);
+	//boolean visualizationFile(String username);
 	
 	void getAllConnections();
 	
@@ -83,5 +83,7 @@ public interface Database extends RemoteService {
 	Set<String> getFriendsList(String username);
 	
 	List<String> staticFriendReq(String username);
+	
+	String graphJSON(String username);
 	
 }

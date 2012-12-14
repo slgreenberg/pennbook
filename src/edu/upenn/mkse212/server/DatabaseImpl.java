@@ -107,6 +107,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	public boolean addFriend(String username, String otherUsername) {
 		//populates users' store of friends
 		updateOnline(username);
+		System.out.println("username"+username);
+		System.out.println("otherUsername"+otherUsername);
 		String time = String.valueOf(System.currentTimeMillis());
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
@@ -119,9 +121,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			if (a.getName().equals("friends")) {
 				buff.append(otherUsername+"~"+a.getValue());
 				buff.deleteCharAt(buff.length()-1);
-				//friend+=a.getValue()+"~";
-				//friend+=otherUsername;
 				friend = buff.toString();
+				System.out.println("expected:otherUsername"+friend);
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
 				li.add(new ReplaceableAttribute("friends",friend,true));
@@ -139,9 +140,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			if (a.getName().equals("friends")) {
 				b.append(username+"~"+a.getValue());
 				buff.deleteCharAt(buff.length()-1);
-				//f+=a.getValue()+"~";
-				//f+=username;
 				f = b.toString();
+				System.out.println("expected:username"+f);
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
 				li.add(new ReplaceableAttribute("friends",friend,true));
@@ -158,12 +158,12 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		list.add(new ReplaceableAttribute("timestamp", ""+time,false));
 		list.add(new ReplaceableAttribute("network",
 				""+getNetwork(username),false));
+		db.putAttributes(new PutAttributesRequest("friends", username, list,
+				new UpdateCondition()));
 		l.add(new ReplaceableAttribute("friend", ""+username,false));
 		l.add(new ReplaceableAttribute("timestamp", ""+time,false));
 		l.add(new ReplaceableAttribute("network",
 				""+getNetwork(otherUsername),false));
-		db.putAttributes(new PutAttributesRequest("friends", username, list,
-				new UpdateCondition()));
 		db.putAttributes(new PutAttributesRequest("friends", otherUsername, l,
 				new UpdateCondition()));
 		
@@ -334,8 +334,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	//returns a list of a user's friends that are currently online
 	//get list of friends and iterates over the list to see if there
 	//has been activity in the past 5 minutes
-	public List<String> getOnline(String username) {
-		List<String> online = new ArrayList<String>();
+	public Set<String> getOnline(String username) {
+		Set<String> online = new HashSet<String>();
 		long time = System.currentTimeMillis();
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("friends",username));
@@ -358,7 +358,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			for (Attribute a : list) {
 				if (a.getName().equals("timestamp")) {
 					long ts = Long.parseLong(a.getValue());
-					if ((time - ts) > 300000.0) {
+					if ((time - ts) < 300000.0) {
 						online.add(s);
 					}
 				}
@@ -478,9 +478,44 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		}
 	}
 	
+	
+	public String graphJSON(String username) {
+		String ret = "{\"id\": \"" + username + "\", \"name\": \"" + username 
+				+ "\", \"children\": [\n";
+		List<String> friends = new ArrayList<String>();
+		String network = "";
+		List<Attribute> l = db.getAttributes(
+				new GetAttributesRequest("users",username)).getAttributes();
+		for (Attribute a : l) {
+			if (a.getName().equals("network")) {
+				network = a.getValue();
+			}
+		}
+		List<Attribute> l2 = db.getAttributes(
+				new GetAttributesRequest("friends",username)).getAttributes();
+		for (Attribute a : l2) {
+			if (a.getName().equals("friend")) {
+				friends.add(a.getValue());
+				ret += "\t{\"id\": \"" + a.getValue() + "\", \"name\": \"" 
+					+ a.getValue() + "\", \"children\": []},\n";
+			}
+		}
+		List<Item> l3 = db.select(new SelectRequest("select username from" +
+				" users where network = '"+network+"' " +
+					"and itemName() != '"+username+"'")).getItems();
+		for (Item i : l3) {
+			if (!friends.contains(i.getName())) {
+				ret += "\t{\"id\": \"" + i.getName() + "\", \"name\": \"" 
+						+ i.getName() + "\", \"children\": []},\n";
+			}
+		}
+		return ret;
+	}
+	
+	
 	//creates file for use of visualization
 	//gets all friends of a user, and all people who are also in their network
-	public void visualizationFile(String username) {
+	/*public boolean visualizationFile(String username) {
 		try {
 			String network = "";
 			BufferedWriter buff = new BufferedWriter(new FileWriter("visualize.txt"));
@@ -508,10 +543,13 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				buff.write(username+"\t"+i.getName());
 				buff.newLine();
 			}
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}	
-	}
+		
+	}*/
 	
 	public Map<String,String> nameUsername() {
 		Map<String,String>nameUsername = new HashMap<String,String>();

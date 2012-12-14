@@ -1,14 +1,14 @@
 10
 
 dir
-1877
+1898
 svn://ds01.seas.upenn.edu:10212/MKSE212-F12/projects/team11/PennBook/src/edu/upenn/mkse212/client
 svn://ds01.seas.upenn.edu:10212
 
 
 
-2012-12-14T09:14:16.934752Z
-1874
+2012-12-14T17:58:49.353539Z
+1898
 joelgold
 
 
@@ -26,16 +26,16 @@ joelgold
 
 5ad26087-e723-4249-8126-bead7c82311c
 
-DatabaseAsync.java
+PennBook.java
 file
-1885
 
 
 
-2012-12-14T16:49:59.199081Z
-e571f158616afd6e9ecb0fcb43b5e221
-2012-12-14T16:50:36.876503Z
-1885
+
+2012-12-03T01:54:11.545049Z
+874ebad9ea8abca87865767c8dd4e7bc
+2012-12-09T22:08:46.669393Z
+1453
 susangr
 
 
@@ -58,18 +58,106 @@ susangr
 
 
 
-2822
+6716
+
+ProfilePanel.java
+file
+
+
+
+
+
+2a36d82f27e6a778739387dca9ab0802
+2012-12-14T17:58:49.353539Z
+1898
+joelgold
+
+
+
+
+
+ProfilePanel.java.r1864
+ProfilePanel.java.r1873
+ProfilePanel.java.mine
+
+CreateAccountPanel.java
+file
+
+
+
+
+2012-12-04T18:50:27.701939Z
+dc1d99ac78d816e486121adafcf0bb6d
+2012-12-09T22:08:46.669393Z
+1453
+susangr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2911
+
+DatabaseAsync.java
+file
+1905
+
+
+
+2012-12-14T19:39:01.803262Z
+ae80baf5ae6221a4583b180a425235b5
+2012-12-14T19:43:52.894606Z
+1905
+susangr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2931
 
 Database.java
 file
-1885
+1905
 
 
 
-2012-12-14T16:50:13.143080Z
-d25395410ec9dc531089c2aea52e4b20
-2012-12-14T16:50:36.876503Z
-1885
+2012-12-14T19:39:12.500608Z
+52170d29208a35aeafe8f814fb690b5b
+2012-12-14T19:43:52.894606Z
+1905
 susangr
 
 
@@ -92,7 +180,7 @@ susangr
 
 
 
-2643
+2685
 
 LoginPanel.java
 file
@@ -195,92 +283,4 @@ susangr
 
 
 3114
-
-PennBook.java
-file
-
-
-
-
-2012-12-03T01:54:11.545049Z
-874ebad9ea8abca87865767c8dd4e7bc
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-6716
-
-ProfilePanel.java
-file
-
-
-
-
-
-fb6566d8c88c3041d098e3f9db82ce95
-2012-12-14T09:14:16.934752Z
-1874
-joelgold
-
-
-
-
-
-ProfilePanel.java.r1864
-ProfilePanel.java.r1873
-ProfilePanel.java.mine
-
-CreateAccountPanel.java
-file
-
-
-
-
-2012-12-04T18:50:27.701939Z
-dc1d99ac78d816e486121adafcf0bb6d
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2911
 

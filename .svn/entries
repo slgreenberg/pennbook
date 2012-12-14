@@ -1,14 +1,14 @@
 10
 
 dir
-1813
+1824
 svn://ds01.seas.upenn.edu:10212/MKSE212-F12/projects/team11/PennBook
 svn://ds01.seas.upenn.edu:10212
 
 
 
-2012-12-14T00:10:20.951363Z
-1813
+2012-12-14T02:13:05.740904Z
+1824
 joelgold
 
 
@@ -33,6 +33,114 @@ joelgold
 
 
 immediates
+
+.git
+dir
+
+gwt-unitCache
+dir
+
+PennBook.war
+file
+
+
+
+
+2012-12-02T22:13:16.531814Z
+e73147aa6ff853d7e9cedab189ac9a76
+2012-12-09T22:08:46.669393Z
+1453
+susangr
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11998905
+
+.project
+file
+
+
+
+
+2012-11-27T16:00:01.189204Z
+8f7f380d62460343fa6243493b5cc191
+2012-12-02T16:20:03.733109Z
+1198
+susangr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+402
+
+PennBook.launch
+file
+
+
+
+
+2012-12-03T17:37:02.297686Z
+b18d4869eaa5f8abb9787854b657968e
+2012-12-09T22:08:46.669393Z
+1453
+susangr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1773
 
 src
 dir
@@ -147,112 +255,4 @@ susangr
 
 
 1182
-
-.git
-dir
-
-gwt-unitCache
-dir
-
-PennBook.war
-file
-
-
-
-
-2012-12-02T22:13:16.531814Z
-e73147aa6ff853d7e9cedab189ac9a76
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-11998905
-
-.project
-file
-
-
-
-
-2012-11-27T16:00:01.189204Z
-8f7f380d62460343fa6243493b5cc191
-2012-12-02T16:20:03.733109Z
-1198
-susangr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-402
-
-PennBook.launch
-file
-
-
-
-
-2012-12-03T17:37:02.297686Z
-b18d4869eaa5f8abb9787854b657968e
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1773
 

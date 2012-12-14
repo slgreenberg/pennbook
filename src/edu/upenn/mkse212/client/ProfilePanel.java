@@ -1,19 +1,15 @@
 package edu.upenn.mkse212.client;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HandlesAllKeyEvents;
-import com.google.gwt.event.dom.client.KeyEvent;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -25,11 +21,11 @@ import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class ProfilePanel {
 	PennBook parent;
+	Map<String, String> userToUsername;
 	public ProfilePanel(PennBook theParent) {
 		this.parent = theParent;
 	}
@@ -39,9 +35,9 @@ public class ProfilePanel {
 		
 		DockLayoutPanel p = new DockLayoutPanel(Unit.EM);
 		p.setHeight("1000px");
-		p.setWidth("900px");
+		p.setWidth("1000px");
 		
-	    final HTML info = new HTML("waiting...");	    
+	    final HTML info = new HTML("waiting...");	
 	    p.insertWest(info, 20, null);
 		
 		
@@ -77,36 +73,60 @@ public class ProfilePanel {
 		vp.add(submitUpdateInfo);
 		updateInfoBox.add(vp);
 
-		
-		
-		
+			
 		
 		// BUTTONS ALONG TOP OF PAGE
+		HorizontalPanel buttonPanel = new HorizontalPanel();
 		final Button updateInfo = new Button("UPDATE MY INFO", new ClickHandler() {
 					public void onClick(ClickEvent sender) {
 						updateInfoBox.center();
 						updateInfoBox.show();
 					}
-				});
-		
-		HorizontalPanel buttonPanel = new HorizontalPanel();
+				});	
 	    final Button feed = new Button("THEFEED");
-	    final Button profile = new Button("MY PROFILE");
-	    final Button signout = new Button("SIGN ME OUT");
+	    final Button profile = new Button("MY PROFILE", new ClickHandler() {
+	    	public void onClick(ClickEvent sender) {
+	    		displayProfileInfo(USERNAME, info);
+	    	}
+	    });
+	    final Button signout = new Button("SIGN OUT", new ClickHandler() {
+	    	public void onClick(ClickEvent sender) {
+	    		parent.getLoginPanel().display();
+	    	}
+	    });
 	    MultiWordSuggestOracle oracle = new MultiWordSuggestOracle(",");
-	    final SuggestBox search = new SuggestBox(oracle);
+	    final SuggestBox searchBox = new SuggestBox(oracle);
 	    buttonPanel.add(feed);
 	    buttonPanel.add(profile);
 	    buttonPanel.add(signout);
 	    buttonPanel.add(updateInfo);
-	    buttonPanel.add(search);
+	    buttonPanel.add(searchBox);
+	    
+		final Button searchButton = new Button("SEARCH", new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				String input = searchBox.getText();
+				if (userToUsername.containsKey(input)) {
+					String username = userToUsername.get(input);
+					displayProfileInfo(username, info);
+				}
+				else if (userToUsername.containsValue(input)) {
+					displayProfileInfo(input, info);
+				}
+				else {
+					parent.popupBox("Sorry", "Either you are not friends with the user you searched, or the user does not exist");
+				}
+				
+			}
+		});
+	    
+	    buttonPanel.add(searchButton);
 	    p.insertNorth(buttonPanel, 5, null);
 	    
 	    updateOracle(USERNAME, oracle);
 	    
 	    	    
-	 	  
-	    p.add(new HTML("content"));
+	 	final HTML wall = new HTML("Loading...");
+	 	p.add(wall);
 
 		RootPanel.get("rootPanelContainer").clear();
 		RootPanel.get("rootPanelContainer").add(p);
@@ -122,7 +142,11 @@ public class ProfilePanel {
 		});
 		
 		
+		
+		
+		
 		displayProfileInfo(USERNAME, info);
+		displayWall(USERNAME, wall);
 
 
 	}
@@ -134,6 +158,7 @@ public class ProfilePanel {
 						parent.popupBox("RPC failure", "getSuggestions");
 					}
 					public void onSuccess(Map<String, String> result) {
+						userToUsername = result;
 						Collection<String> usernames = result.values();
 						Set<String> names = result.keySet();
 						oracle.addAll(usernames);
@@ -161,15 +186,31 @@ public class ProfilePanel {
 					});
 	}
 	
-	public static void wait (int n) {
-		long s1;
-		long s2;
-		
-		s1 = System.currentTimeMillis();
-		
-		do {
-			s2 = System.currentTimeMillis();
-		}
-		while (s2 - s1 > n);
+	public void displayWall(String username, final HTML wall) {
+		parent.getDatabaseService().getWall(username,
+				new AsyncCallback<List<List<String>>>() {
+					public void onFailure(Throwable caught) {
+						parent.popupBox("RPC failure", "displayWall");
+					}
+					public void onSuccess(List<List<String>> results) {
+						Iterator<List<String>> i = results.iterator();
+						while (i.hasNext()) {
+							List<String> result = i.next();
+							System.out.println("postID " + result.get(0));
+							System.out.println("postedBy " + result.get(1));
+							System.out.println("post " + result.get(2));
+							System.out.println("comments " + result.get(3));
+							String postId = result.get(0);
+							System.out.println(postId);
+							Date date = new Date(postId);
+							String time = date.toString();
+							String postedBy = result.get(1);
+							String post = result.get(2);
+							String comments = result.get(3);
+							wall.setHTML("At " + time + " "+ postedBy + " was all like " + post);
+						}
+						
+					}
+				});
 	}
 }

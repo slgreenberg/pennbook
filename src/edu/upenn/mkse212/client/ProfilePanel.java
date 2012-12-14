@@ -89,6 +89,7 @@ public class ProfilePanel {
 	    final Button profile = new Button("MY PROFILE", new ClickHandler() {
 	    	public void onClick(ClickEvent sender) {
 	    		displayProfileInfo(USERNAME, info);
+	    		displayWall(USERNAME, wall);
 	    	}
 	    });
 	    final Button signout = new Button("SIGN OUT", new ClickHandler() {
@@ -96,6 +97,7 @@ public class ProfilePanel {
 	    		parent.getLoginPanel().display();
 	    	}
 	    });
+	    
 	    MultiWordSuggestOracle oracle = new MultiWordSuggestOracle(",");
 	    final SuggestBox searchBox = new SuggestBox(oracle);
 	    buttonPanel.add(feed);
@@ -204,13 +206,9 @@ public class ProfilePanel {
 						parent.popupBox("RPC failure", "getWall");
 					}
 					public void onSuccess(List<List<String>> results) {
-						Iterator<List<String>> i = results.iterator();
 						System.out.println("LENGTH " + results.size());
-						for (List<String> ls : results) {
-							String postId = ls.get(0);
-						}
-						while (i.hasNext()) {
-							List<String> result = i.next();
+						for (List<String> result : results) {
+							System.out.println(result.toString());
 							String postId = result.get(0);
 							System.out.println(postId);
 							Date date = new Date(System.currentTimeMillis());
@@ -221,9 +219,11 @@ public class ProfilePanel {
 							wall.setHTML("At " + time + " "+ postedBy + " was all like " + post);
 							/*
 							wall.setHTML(
-									"<strong>" + postedBy + "</strong>" + "<br />"
+								"<strong>" + postedBy + "</strong>" + "<br />" +
+									
 							);
 							*/
+							
 						}
 						
 					}

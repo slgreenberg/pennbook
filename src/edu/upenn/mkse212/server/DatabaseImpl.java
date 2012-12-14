@@ -239,7 +239,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		updateOnline(username);
 		SelectResult r = db.select(new SelectRequest("select postID from " +
 				"updates where itemName() = '"+username+"' and postID is not " +
-				"null order by postID desc"));
+				"null order by postID desc",true));
 		List<Item> item = r.getItems();
 		List<List<String>> ret = new LinkedList<List<String>>();
 		for (Item i : item) {
@@ -511,11 +511,18 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				ret[2] = a.getValue();
 			} else if (a.getName().equals("network")) {
 				ret[3] = a.getValue();
-			} else if (a.getName().equals("interests")) {
-				ret[4] = a.getValue();
 			} else if (a.getName().equals("birthday")) {
 				ret[5] = a.getValue();
 			} 
+		}
+		List<Item> l = db.select(new SelectRequest("select interest from users" +
+				" where itemName = '"+username+"'")).getItems();
+		for (Item i : l) {
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("interest")) {
+					ret[4] = a.getValue();
+				}
+			}
 		}
 		ret[6] = username;
 		return ret;

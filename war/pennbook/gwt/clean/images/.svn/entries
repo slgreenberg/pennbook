@@ -1,7 +1,7 @@
 10
 
 dir
-1838
+1842
 svn://ds01.seas.upenn.edu:10212/MKSE212-F12/projects/team11/PennBook/war/pennbook/gwt/clean/images
 svn://ds01.seas.upenn.edu:10212
 
@@ -25,74 +25,6 @@ susangr
 
 
 5ad26087-e723-4249-8126-bead7c82311c
-
-corner_ie6.png
-file
-
-
-
-
-2011-08-29T17:17:58.000000Z
-4580e3995399bd237042581fac05380d
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-412
-
-thumb_horz.png
-file
-
-
-
-
-2011-08-29T17:17:58.000000Z
-df006caa625e042722df8e2ef431b991
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-222
 
 vborder.png
 file
@@ -365,4 +297,72 @@ has-props
 
 
 231
+
+corner_ie6.png
+file
+
+
+
+
+2011-08-29T17:17:58.000000Z
+4580e3995399bd237042581fac05380d
+2012-12-09T22:08:46.669393Z
+1453
+susangr
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+412
+
+thumb_horz.png
+file
+
+
+
+
+2011-08-29T17:17:58.000000Z
+df006caa625e042722df8e2ef431b991
+2012-12-09T22:08:46.669393Z
+1453
+susangr
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+222
 

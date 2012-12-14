@@ -1,7 +1,7 @@
 10
 
 dir
-1838
+1842
 svn://ds01.seas.upenn.edu:10212/MKSE212-F12/projects/team11/PennBook/war/WEB-INF/lib
 svn://ds01.seas.upenn.edu:10212
 
@@ -25,6 +25,40 @@ susangr
 
 
 5ad26087-e723-4249-8126-bead7c82311c
+
+gwt-servlet.jar
+file
+
+
+
+
+2012-11-27T16:13:07.667107Z
+1a8747b80c7c1b05517f3ca5fac2ce7e
+2012-12-02T16:20:03.733109Z
+1198
+susangr
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5434137
 
 commons-codec-1.4.jar
 file
@@ -263,38 +297,4 @@ has-props
 
 
 2102741
-
-gwt-servlet.jar
-file
-
-
-
-
-2012-11-27T16:13:07.667107Z
-1a8747b80c7c1b05517f3ca5fac2ce7e
-2012-12-02T16:20:03.733109Z
-1198
-susangr
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5434137
 

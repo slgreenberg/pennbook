@@ -82,4 +82,6 @@ public interface Database extends RemoteService {
 	
 	Set<String> getFriendsList(String username);
 	
+	List<String> staticFriendReq(String username);
+	
 }

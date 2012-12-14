@@ -408,6 +408,38 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return false;
 	}
 	
+	public List<String> staticFriendReq(String username) {
+		List<String> ret = new ArrayList<String>();
+		List<Item> item = db.select(new SelectRequest("select friends " +
+				"from users where itemName = '"+username+"'")).getItems();
+		StringBuffer buff = new StringBuffer();
+		buff.append("(");
+		for (Item i : item) {
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("friends")) {
+					String[] arr = a.getValue().split("~");
+					for(String s : arr) {
+						buff.append("'"+s+"'");
+					}
+				}
+			}
+		}
+		buff.deleteCharAt(buff.length()-1);
+		buff.append(")");
+		String string = buff.toString();
+		List<Item> il = db.select(new SelectRequest("select friend from " +
+				"friends where itemName() in "+string+" and friend not in " +
+						""+string)).getItems();
+		for (Item i : il) {
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("friend")) {
+					ret.add(a.getValue());
+				}
+			}
+		}
+		return ret;
+	}
+	
 	
 	
 	//creates the file for adsorption

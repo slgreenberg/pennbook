@@ -36,7 +36,7 @@ public class FieldVerifier {
   public static boolean isValidName(String name) {
 	  if (name.toLowerCase().contains("drop table") || 
 			  name.toLowerCase().contains("select")) {return false; }
-	  return true;
+	  return checkInput(name);
   }
   
   public static boolean checkInput(String string) {

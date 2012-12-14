@@ -206,6 +206,9 @@ public class ProfilePanel {
 					public void onSuccess(List<List<String>> results) {
 						Iterator<List<String>> i = results.iterator();
 						System.out.println("LENGTH " + results.size());
+						for (List<String> ls : results) {
+							String postId = ls.get(0);
+						}
 						while (i.hasNext()) {
 							List<String> result = i.next();
 							String postId = result.get(0);

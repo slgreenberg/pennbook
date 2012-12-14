@@ -289,12 +289,18 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 						new GetAttributesRequest("posts",s)).getAttributes();
 					List<String> lis = new LinkedList<String>();
 					lis.add(0,s);
+					lis.add(1,"");
+					lis.add(2,"");
+					lis.add(3,"");
 					for (Attribute a2 : alist) {
 						if (a2.getName().equals("postedBy")) {
+							lis.remove(1);
 							lis.add(1,a2.getValue());
 						} else if (a2.getName().equals("post")) {
+							lis.remove(2);
 							lis.add(2,a2.getValue());
 						} else if (a2.getName().equals("comments")) {
+							lis.remove(3);
 							lis.add(3,a2.getValue());
 						}
 					}

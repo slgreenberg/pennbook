@@ -80,4 +80,6 @@ public interface Database extends RemoteService {
 	
 	Boolean isFriend(String username, String otherUsername);
 	
+	Set<String> getFriendsList(String username);
+	
 }

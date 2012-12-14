@@ -14,6 +14,8 @@
  *******************************************************************************/
 package edu.upenn.mkse212.server;
 
+import edu.upenn.mkse212.IKeyValueStorage;
+import edu.upenn.mkse212.KeyValueStoreFactory;
 import edu.upenn.mkse212.client.Database;
 
 import java.io.BufferedWriter;
@@ -30,7 +32,6 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
-	private Map<String,String> nameUsername;
 	
 	private AmazonSimpleDBClient db;
 	
@@ -425,7 +426,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				}
 			}
 			List<Item> item = db.select(
-					new SelectRequest("select * from users")).getItems();
+					new SelectRequest("select interests from users",true)).getItems();
 			for (Item i : item) {
 				for (Attribute a : i.getAttributes()) {
 					if (a.getName().equals("interest")) {
@@ -477,7 +478,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	}
 	
 	public Map<String,String> nameUsername() {
-		nameUsername = new HashMap<String,String>();
+		Map<String,String>nameUsername = new HashMap<String,String>();
 		SelectResult r = db.select(
 				new SelectRequest("select firstName, lastName from users"));
 		for (Item i : r.getItems()) {
@@ -489,17 +490,27 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 					ret = ret + a.getValue();
 				}
 			}
-			nameUsername.put(i.getName(), ret);
+			nameUsername.put(ret, i.getName());
 		}
 		return nameUsername;
 	}
 	
 	public Map<String,String> usernameName() {
-		Map<String,String> map = new HashMap<String,String>();
-		for (String s : nameUsername.keySet()) {
-			map.put(nameUsername.get(s), s);
+		Map<String, String> usernameName = new HashMap<String, String>();
+		SelectResult r = db.select(
+				new SelectRequest("select firstName, lastName from users"));
+		for (Item i : r.getItems()) {
+			String ret = "";
+			for (Attribute a : i.getAttributes()) {
+				if (a.getName().equals("firstName")) {
+					ret = a.getValue() + " " + ret;
+				} else if (a.getName().equals("lastName")) {
+					ret = ret + a.getValue();
+				}
+			}
+			usernameName.put(i.getName(), ret);
 		}
-		return map;
+		return usernameName;
 	}
 	
 	
@@ -541,10 +552,10 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			} 
 		}
 		List<Item> l = db.select(new SelectRequest("select interests from users" +
-				" where itemName = '"+username+"'")).getItems();
+				" where itemName() = '"+username+"'",true)).getItems();
 		for (Item i : l) {
 			for (Attribute a : i.getAttributes()) {
-				if (a.getName().equals("interest")) {
+				if (a.getName().equals("interests")) {
 					ret[4] = a.getValue();
 				}
 			}
@@ -605,6 +616,16 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		db.putAttributes(new PutAttributesRequest("users", username, list, 
 				new UpdateCondition()));
 		return new Integer(loginsSoFar);
+	}
+	
+	
+	public Set<String> getFriendsList(String username)
+			throws IllegalArgumentException {
+		Set<String> results = new HashSet<String>();
+		IKeyValueStorage socialGraph = KeyValueStoreFactory.getKeyValueStore(KeyValueStoreFactory.STORETYPE.BERKELEY, 
+			    "socialGraph", "/home/mkse212/bdb/", "user", "authKey", false);
+		results.addAll(socialGraph.get(username));
+		return results;
 	}
 	
 

@@ -275,7 +275,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		buff.append(")");
 		String string = buff.toString();
 		SelectResult sr = db.select(new SelectRequest("select userID from" +
-				" updates where every(itemName()) in "+string+", userID is " +
+				" updates where every(itemName()) in "+string+" and userID is " +
 						"not null order by userID desc"));
 		List<Item> item = sr.getItems(); 
 		for (Item i : item) {

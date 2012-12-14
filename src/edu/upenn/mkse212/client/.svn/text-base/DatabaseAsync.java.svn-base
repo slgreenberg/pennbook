@@ -59,7 +59,7 @@ public interface DatabaseAsync {
 	void getPostAndComment(String postID, AsyncCallback<List<String>> callback)
 			throws IllegalArgumentException;
 	
-	void getFeed(String username, AsyncCallback<List<String>> callback) 
+	void getFeed(String username, AsyncCallback<List<List<String>>> callback) 
 			throws IllegalArgumentException;
 	
 	void nameUsername(AsyncCallback<Map<String,String>> callback) 

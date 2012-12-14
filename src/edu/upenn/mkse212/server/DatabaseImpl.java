@@ -340,14 +340,18 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		GetAttributesResult results = db.getAttributes(
 				new GetAttributesRequest("friends",username));
 		List<Attribute> aList = results.getAttributes();
-		String friends = "";
+		List<String> friends = new ArrayList<String>();
 		for (Attribute a : aList) {
-			if (a.getName().equals("friends")) {
-				friends+=a.getValue();
+			if (a.getName().equals("friend")) {
+				if (!a.getValue().equals(username)) {
+					friends.add(a.getValue());
+				}
 			}
 		}
-		String[] arr = friends.split("~");
-		for (String s : arr) {
+		if (friends.size() == 0) {
+			return online;
+		}
+		for (String s : friends) {
 			GetAttributesResult r = db.getAttributes(
 					new GetAttributesRequest("online",s));
 			List<Attribute> list = results.getAttributes();
@@ -516,7 +520,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	public Boolean isFriend(String username, String otherUsername) {
 		List<Item> item = db.select(new SelectRequest("select friends " +
-				"from users where itemName() = "+username)).getItems();
+				"from users where itemName() = '"+username+"'")).getItems();
+		//List<Item> item = db.select(new SelectRequest("select friends from users",true)).getItems();
 		for (Item i : item) {
 			for (Attribute a : i.getAttributes()) {
 				if (a.getName().equals("friends")) {

@@ -27,6 +27,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import edu.upenn.mkse212.shared.FieldVerifier;
+
 public class ProfilePanel {
 	PennBook parent;
 	Map<String, String> nameToUsername;
@@ -34,6 +36,7 @@ public class ProfilePanel {
 	String friendUserName;
 	String USERNAME;
 	Button addFriendButton;
+	VerticalPanel friendReccs;
 	
 	public ProfilePanel(PennBook theParent) {
 		this.parent = theParent;
@@ -121,8 +124,12 @@ public class ProfilePanel {
 							public void onFailure(Throwable caught) {
 								parent.popupBox("RPC failure", "Visualize");
 							}
+
 							public void onSuccess(String results) {
-								parent.getFriendViewer().drawNodeAndNeighbors(USERNAME);
+								System.out.println(results);
+
+								parent.getFriendVisualization().createGraph(results, ProfilePanel.this);
+
 							}
 						});		
 	    	}
@@ -161,7 +168,7 @@ public class ProfilePanel {
 	    buttonPanel.add(searchButton);
 	    p.insertNorth(buttonPanel, 5, null);
 	    
-	    VerticalPanel friendReccs = new VerticalPanel();
+	    friendReccs = new VerticalPanel();
 	    p.insertEast(friendReccs, 20, null);
 	    
 	    VerticalPanel onlineFriends = new VerticalPanel();
@@ -214,6 +221,7 @@ public class ProfilePanel {
 					public void onSuccess(Set<String> results) {
 						HTML friends = new HTML();
 						String html = "These friends are currently online: <br />";
+						System.out.println("online "+results.toString());
 						for (String result : results) {
 							html += result + "<br />";
 						}
@@ -262,14 +270,17 @@ public class ProfilePanel {
 	}
 	
 	public void displayWall(final String username, final VerticalPanel vpwall, final HTML info, final Button addFriendButton) {
-		parent.getDatabaseService().isFriend(USERNAME, username,
+		if (USERNAME.equals(username)) {
+			reallyDisplayWall(username, vpwall, info);
+		} else {
+			parent.getDatabaseService().isFriend(USERNAME, username,
 				new AsyncCallback<Boolean>() {
 					public void onFailure(Throwable caught) {
 						parent.popupBox("RPC failure", "isFriend");
 					}
 					@Override
 					public void onSuccess(Boolean result) {
-						if (result || USERNAME.equals(username)) {
+						if (result) {
 							reallyDisplayWall(username, vpwall, info);
 						} else {
 							vpwall.clear();
@@ -278,7 +289,8 @@ public class ProfilePanel {
 						
 					}
 
-		});
+				});
+		}
 	}
 		
 		
@@ -421,12 +433,18 @@ public class ProfilePanel {
 						if (results) {
 							addFriendButton.setHTML("FRIENDED, I hope they say yes!");
 							addFriendButton.setEnabled(false);
+							displayFriendReccs(friendReccs);
+							
 						}
 					}
 				});
 	}
 	
 	private void addPost(final String username, final String friendUserName, String text, final VerticalPanel vpwall, final HTML info) {
+		if (!FieldVerifier.checkInput(text)) {
+			parent.popupBox("Sorry", "That is an invalid input, please try again.");
+			return;
+		}
 		parent.getDatabaseService().addPost(friendUserName, username, text,
 				new AsyncCallback<Boolean>() {
 					public void onFailure(Throwable caught) {
@@ -441,6 +459,11 @@ public class ProfilePanel {
 	
 
 	private void addComment(String username, final String text, String postId, final VerticalPanel vpwall, final HTML info) {
+		if (!FieldVerifier.checkInput(text)) {
+			parent.popupBox("Sorry", "That is an invalid input, please try again.");
+			return;
+		}
+		
 		parent.getDatabaseService().addComment(username, text, postId,
 				new AsyncCallback<Boolean>() {
 					public void onFailure(Throwable caught) {

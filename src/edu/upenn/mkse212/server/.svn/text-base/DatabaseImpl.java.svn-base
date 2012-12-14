@@ -512,6 +512,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 						+ i.getName() + "\", \"children\": []},\n";
 			}
 		}
+		ret = ret.substring(0, ret.length() - 2);
+		ret += "\n]}";
 		return ret;
 	}
 	

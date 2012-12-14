@@ -107,8 +107,6 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	public boolean addFriend(String username, String otherUsername) {
 		//populates users' store of friends
 		updateOnline(username);
-		System.out.println("username"+username);
-		System.out.println("otherUsername"+otherUsername);
 		String time = String.valueOf(System.currentTimeMillis());
 		GetAttributesResult result = db.getAttributes(
 				new GetAttributesRequest("users", username));
@@ -120,9 +118,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		for (Attribute a : attributeList) {
 			if (a.getName().equals("friends")) {
 				buff.append(otherUsername+"~"+a.getValue());
-				buff.deleteCharAt(buff.length()-1);
 				friend = buff.toString();
-				System.out.println("expected:otherUsername"+friend);
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
 				li.add(new ReplaceableAttribute("friends",friend,true));
@@ -141,7 +137,6 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				b.append(username+"~"+a.getValue());
 				buff.deleteCharAt(buff.length()-1);
 				f = b.toString();
-				System.out.println("expected:username"+f);
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
 				li.add(new ReplaceableAttribute("friends",friend,true));
@@ -348,9 +343,6 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				}
 			}
 		}
-		if (friends.size() == 0) {
-			return online;
-		}
 		for (String s : friends) {
 			GetAttributesResult r = db.getAttributes(
 					new GetAttributesRequest("online",s));
@@ -358,6 +350,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			for (Attribute a : list) {
 				if (a.getName().equals("timestamp")) {
 					long ts = Long.parseLong(a.getValue());
+					//System.out.println(time - ts);
 					if ((time - ts) < 300000.0) {
 						online.add(s);
 					}
@@ -410,9 +403,9 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 	
 	public List<String> staticFriendReq(String username) {
 		List<String> ret = new ArrayList<String>();
-		//List<Item> item = db.select(new SelectRequest("select friends " +
-		//		"from users where itemName() = '"+username+"'")).getItems();
-		List<Item> item = db.select(new SelectRequest("select friends from users")).getItems();
+		List<Item> item = db.select(new SelectRequest("select friends " +
+				"from users where itemName() = '"+username+"'")).getItems();
+		//List<Item> item = db.select(new SelectRequest("select friends from users")).getItems();
 		StringBuffer buff = new StringBuffer();
 		buff.append("(");
 		for (Item i : item) {
@@ -428,6 +421,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		buff.deleteCharAt(buff.length()-1);
 		buff.append(")");
 		String string = buff.toString();
+		System.out.println(string);
 		List<Item> il = db.select(new SelectRequest("select friend from " +
 				"friends where itemName() in "+string)).getItems();
 		for (Item i : il) {
@@ -512,6 +506,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 						+ i.getName() + "\", \"children\": []},\n";
 			}
 		}
+		ret = ret.substring(0, ret.length() - 2);
+		ret += "\n]}";
 		return ret;
 	}
 	

@@ -36,7 +36,7 @@ public class PennBook implements EntryPoint {
   private LoginPanel loginPanel;
   private CreateAccountPanel createAccountPanel;
   private String handle;
-  private FriendViewer friendViewer;
+  private FriendVisualization friendVisualization;
   
   protected DatabaseAsync getDatabaseService() {
 	  return databaseService;
@@ -50,8 +50,8 @@ public class PennBook implements EntryPoint {
   protected CreateAccountPanel getCreateAccountPanel() {
 	  return createAccountPanel;
   }
-  protected FriendViewer getFriendViewer() {
-	  return friendViewer;
+  protected FriendVisualization getFriendVisualization() {
+	  return friendVisualization;
   }
   
   
@@ -59,7 +59,7 @@ public class PennBook implements EntryPoint {
 	  wallPanel = new ProfilePanel(this);
 	  loginPanel = new LoginPanel(this);
 	  createAccountPanel = new CreateAccountPanel(this);
-	  friendViewer = new FriendViewer(this);
+	  friendVisualization = new FriendVisualization(this);
 	  loginPanel.display();
   }
   

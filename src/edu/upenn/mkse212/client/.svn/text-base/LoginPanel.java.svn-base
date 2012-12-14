@@ -8,9 +8,12 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+
+import edu.upenn.mkse212.shared.FieldVerifier;
 
 public class LoginPanel {
 	
@@ -24,7 +27,7 @@ public class LoginPanel {
 	
 	void display() {
 		final TextBox usernameField = new TextBox();
-		final TextBox passwordField = new TextBox();
+		final PasswordTextBox passwordField = new PasswordTextBox();
 		final Button loginButton = new Button("Login");
 		final Button signupButton = new Button("Don't have an account? Signup!");
 		AbsolutePanel p = new AbsolutePanel();
@@ -43,6 +46,10 @@ public class LoginPanel {
 		loginButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				final String username = usernameField.getText();
+				if (!FieldVerifier.isValidName(username)) {
+					parent.popupBox("Sorry", "That is a valid username, please try again.");
+					return;
+				}
 				parent.getDatabaseService().validateLogin(username, passwordField.getText(),
 						new AsyncCallback<Boolean>() {
 							public void onFailure(Throwable caught) {

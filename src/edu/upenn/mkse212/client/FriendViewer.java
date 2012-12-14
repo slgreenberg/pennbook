@@ -14,31 +14,24 @@
  *******************************************************************************/
 package edu.upenn.mkse212.client;
 
-import java.util.Set;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
 
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class FriendViewer implements EntryPoint {
+public class FriendViewer {
 	
 	PennBook parent;
 
 	//NEED TO DEFINE WHO THE USER IS
 	private String username;
-	private String ret;
-	private JavaScriptObject graph;
 	
 	public FriendViewer(PennBook theParent) {
 		this.parent = theParent;
@@ -48,6 +41,7 @@ public class FriendViewer implements EntryPoint {
 	//created, it creates a new graph, otherwise it updates the current
 	//graph.
 	public void drawNodeAndNeighbors(final String text) {
+		/*
 		Database.Util.getInstance().getFriendsList(text, new AsyncCallback<Set<String>>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("Unable to talk to server");
@@ -61,19 +55,16 @@ public class FriendViewer implements EntryPoint {
 				}
 				ret = ret.substring(0, ret.length() - 2);
 				ret += "\n]}";
-				if (graph == null) {
-					graph = FriendVisualization.createGraph(ret, FriendViewer.this);
-				} else {
-					FriendVisualization.addToGraph(graph, ret);
-				}
-			}
+		*/
+					// FriendVisualization.createGraph(text, FriendViewer.this);
+
 			
-		});
+		//});
 		
+	//}
 	}
 	
-	
-	
+	/*
 	
 	private Button queryButton;
 	public void onModuleLoad() {
@@ -95,6 +86,9 @@ public class FriendViewer implements EntryPoint {
 			}
 		});
 		
+
+		
 		
 	}
+	*/
 }

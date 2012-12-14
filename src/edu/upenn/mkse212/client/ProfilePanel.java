@@ -26,6 +26,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class ProfilePanel {
 	PennBook parent;
 	Map<String, String> userToUsername;
+	String friendUserName;
+	
 	public ProfilePanel(PennBook theParent) {
 		this.parent = theParent;
 	}
@@ -45,7 +47,6 @@ public class ProfilePanel {
 		// UPDATE INTERESTS BOX 
 		final DialogBox updateInfoBox = new DialogBox();
 		final Label directions = new Label ("Type in your interests to update your interests");
-		final Label interests = new Label ("Interests: ");
 		final TextBox interestField = new TextBox();
 		
 		final Button submitUpdateInfo = new Button("Sumbit", new ClickHandler() {
@@ -60,6 +61,7 @@ public class ProfilePanel {
 								public void onSuccess(Boolean success) {
 									updateInfoBox.hide();
 									displayProfileInfo(USERNAME, info);
+									displayWall(USERNAME, wall);
 								}
 					});
 				}
@@ -69,7 +71,6 @@ public class ProfilePanel {
 		
 		VerticalPanel vp = new VerticalPanel();
 		vp.add(directions);
-		vp.add(interests);
 		vp.add(interestField);
 		vp.add(submitUpdateInfo);
 		updateInfoBox.add(vp);
@@ -127,9 +128,6 @@ public class ProfilePanel {
 	    
 	    updateOracle(USERNAME, oracle);
 	    
-	    	    
-
-
 		RootPanel.get("rootPanelContainer").clear();
 		RootPanel.get("rootPanelContainer").add(p);
 		
@@ -144,7 +142,17 @@ public class ProfilePanel {
 		});
 		
 		
+		final Button addFriendButton = new Button("HELL YEAH, I WANA BE FRIENDS!");
+		addFriendButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				addFriend(USERNAME, friendUserName, addFriendButton);
+			}
 
+		});
+		
+		// NEED AN IF STATEMENT FOR IF TO DISPLAY WALL OR FRIEND BUTTON.
+		
+		// this must be last!
 	 	p.add(wall);
 			
 		displayProfileInfo(USERNAME, info);
@@ -169,7 +177,7 @@ public class ProfilePanel {
 				});
 		
 	}
-	public void displayProfileInfo(String username, final HTML info) {
+	public void displayProfileInfo(final String username, final HTML info) {
 		// DISPLAY PROFILE INFORMATION.
 		parent.getDatabaseService().getInfo(username,
 					new AsyncCallback<String[]>() {
@@ -177,6 +185,7 @@ public class ProfilePanel {
 							parent.popupBox("RPC failure", "getInfo");
 						}
 						public void onSuccess(String[] results) {
+							friendUserName = username;
 							info.setHTML("NAME: " + results[0] + " " + results[1] + " <br />" + 
 									     "USERNAME: " + results[6] + " <br />" + 
 									     "EMAIL: " + results[2] + " <br />" + 
@@ -196,22 +205,40 @@ public class ProfilePanel {
 					}
 					public void onSuccess(List<List<String>> results) {
 						Iterator<List<String>> i = results.iterator();
+						System.out.println("LENGTH " + results.size());
 						while (i.hasNext()) {
 							List<String> result = i.next();
-							System.out.println("postID " + result.get(0));
-							System.out.println("postedBy " + result.get(1));
-							System.out.println("post " + result.get(2));
-							System.out.println("comments " + result.get(3));
 							String postId = result.get(0);
 							System.out.println(postId);
-							//Date date = new Date(postId);
-							//String time = date.toString();
+							Date date = new Date(System.currentTimeMillis());
+							String time = date.toString();
 							String postedBy = result.get(1);
 							String post = result.get(2);
 							String comments = result.get(3);
-							wall.setHTML("At "  + " "+ postedBy + " was all like " + post);
+							wall.setHTML("At " + time + " "+ postedBy + " was all like " + post);
+							/*
+							wall.setHTML(
+									"<strong>" + postedBy + "</strong>" + "<br />"
+							);
+							*/
 						}
 						
+					}
+				});
+	}
+	
+
+	private void addFriend(String username, String friendUserName, final Button addFriendButton) {
+		parent.getDatabaseService().addFriend(username, friendUserName,
+				new AsyncCallback<Boolean>() {
+					public void onFailure(Throwable caught) {
+						parent.popupBox("RPC failure", "getWall");
+					}
+					public void onSuccess(Boolean results) {
+						if (results) {
+							addFriendButton.setHTML("FRIENDED, I hope they say yes!");
+							addFriendButton.setEnabled(false);
+						}
 					}
 				});
 	}

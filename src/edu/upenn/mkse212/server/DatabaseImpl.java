@@ -238,6 +238,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		for (Item i : item) {
 			for (Attribute a : i.getAttributes()) {
 				if (a.getName().equals("postID")) {
+					System.out.println(a.getValue());
 					ret.add(getPostAndComment(a.getValue()));
 				}
 			}

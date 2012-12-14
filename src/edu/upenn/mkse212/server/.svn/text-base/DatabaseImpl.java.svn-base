@@ -204,8 +204,8 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 			if (a.getName().equals("comments")) {
 				List<ReplaceableAttribute> li = 
 						new LinkedList<ReplaceableAttribute>();
-				li.add(new ReplaceableAttribute("comments", 
-						""+username+"|"+text+"~"+a.getValue(),true));
+				li.add(new ReplaceableAttribute("comments", a.getValue() + 
+						username + "~" + text + "~~",true));
 				db.putAttributes(new PutAttributesRequest("posts", postID, li,
 						new UpdateCondition()));
 			}
@@ -403,9 +403,10 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 		return false;
 	}
 	
+	
+	
 	//creates the file for adsorption
 	//gets all friendships from all users
-	//TODO interests
 	public void getAllConnections() {
 		try {
 			BufferedWriter buff = new BufferedWriter(new FileWriter("adsorption.txt"));
@@ -420,6 +421,18 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 						buff.newLine();
 					} else if (a.getName().equals("network")) {
 						buff.write(i.getName()+"\t"+a.getValue());
+					}
+				}
+			}
+			List<Item> item = db.select(
+					new SelectRequest("select * from users")).getItems();
+			for (Item i : item) {
+				for (Attribute a : i.getAttributes()) {
+					if (a.getName().equals("interest")) {
+						String[] arr = a.getValue().split(",");
+						for (String s : arr) {
+							buff.write(i.getName()+"\t"+s);
+						}
 					}
 				}
 			}

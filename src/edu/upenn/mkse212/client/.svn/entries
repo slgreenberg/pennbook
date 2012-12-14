@@ -1,14 +1,14 @@
 10
 
 dir
-1853
+1864
 svn://ds01.seas.upenn.edu:10212/MKSE212-F12/projects/team11/PennBook/src/edu/upenn/mkse212/client
 svn://ds01.seas.upenn.edu:10212
 
 
 
-2012-12-14T05:04:02.275534Z
-1853
+2012-12-14T06:56:05.909779Z
+1864
 joelgold
 
 
@@ -26,6 +26,74 @@ joelgold
 
 5ad26087-e723-4249-8126-bead7c82311c
 
+LoginPanel.java
+file
+
+
+
+
+2012-12-13T21:55:13.877926Z
+cda896fa82e629bf44846e8e403be8b4
+2012-12-13T21:54:56.157643Z
+1801
+joelgold
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2248
+
+PennBook.java
+file
+
+
+
+
+2012-12-03T01:54:11.545049Z
+874ebad9ea8abca87865767c8dd4e7bc
+2012-12-09T22:08:46.669393Z
+1453
+susangr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6716
+
 ProfilePanel.java
 file
 
@@ -33,9 +101,9 @@ file
 
 
 
-3d9b060489e23283fb699d9ffd4d22db
-2012-12-14T05:04:02.275534Z
-1853
+56a13a0b28bfb5673a1b41d4360ab23b
+2012-12-14T06:56:05.909779Z
+1864
 joelgold
 
 
@@ -147,72 +215,4 @@ susangr
 
 
 2545
-
-LoginPanel.java
-file
-
-
-
-
-2012-12-13T21:55:13.877926Z
-cda896fa82e629bf44846e8e403be8b4
-2012-12-13T21:54:56.157643Z
-1801
-joelgold
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2248
-
-PennBook.java
-file
-
-
-
-
-2012-12-03T01:54:11.545049Z
-874ebad9ea8abca87865767c8dd4e7bc
-2012-12-09T22:08:46.669393Z
-1453
-susangr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-6716
 

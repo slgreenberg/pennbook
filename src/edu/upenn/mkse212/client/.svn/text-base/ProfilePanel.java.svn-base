@@ -1,5 +1,6 @@
 package edu.upenn.mkse212.client;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -8,10 +9,13 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -23,6 +27,7 @@ import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePanel {
 	PennBook parent;
@@ -203,49 +208,85 @@ public class ProfilePanel {
 	}
 	
 	public void displayWall(String username, final VerticalPanel vpwall) {
-		parent.getDatabaseService().getFeed(username,
+		parent.getDatabaseService().getWall(username,
 				new AsyncCallback<List<List<String>>>() {
 					public void onFailure(Throwable caught) {
 						parent.popupBox("RPC failure", "getWall");
 					}
 					public void onSuccess(List<List<String>> results) {
 						vpwall.clear();
-						final HTML wall = new HTML();
 						final VerticalPanel holder = new VerticalPanel();
-						final TextArea commentBox = new TextArea();
-						commentBox.setVisibleLines(1);
-						final Button commentButton = new Button("POST THIS SWEET THANG!");
-						commentButton.addClickHandler(new ClickHandler() {
+						final TextBox postBox = new TextBox();
+						final Button postButton = new Button("POST THIS SWEET THANG!");
+						postButton.addClickHandler(new ClickHandler() {
 							public void onClick(ClickEvent event) {
-								if (!commentBox.getText().equals("")) {
-									addPost(USERNAME, friendUserName, commentBox.getText(), wall, vpwall);
+								if (!postBox.getText().equals("")) {
+									addPost(USERNAME, friendUserName, postBox.getText(), vpwall);
 								}
 							}
 						});
-						holder.add(commentBox);
-						holder.add(commentButton);
+						holder.add(postBox);
+						holder.add(postButton);
 						vpwall.add(holder);
-						vpwall.add(wall);
 						
-						String wallString = "";
 						for (List<String> result : results) {
-							String postId = result.get(0);
+							String wallString = "";
+							HTML wall = new HTML();
+							final String postId = result.get(0);
 							System.out.println(postId);
 							Date date = new Date(System.currentTimeMillis());
 							String time = date.toString();
 							String postedBy = result.get(1);
 							String post = result.get(2);
-							String comments = result.get(3);
+							String commentString = result.get(3);
 							wallString +=
-								"<br /><div>" + 
+								"<br />" +
+								"<div>" + 
 									"<strong>" + postedBy + "</strong>" + "<br />" +
 									"<i>" + time + "</i><br />" +
-									"<span>" + post + "</span>" +
-								"</div>"
-							;	
+									"<span>" + post + "</span><br />";
+							if (!commentString.equals("")) {
+								String[] comments = commentString.split("~~");
+								for (String comment : comments) {
+									String[] commentFeatures = comment.split("~");
+									String commenter = commentFeatures[0];
+									String commentText = commentFeatures[1];
+									wallString +=
+										"<div style='margin-left:15px'>" +
+											"<strong>" + commenter + "</strong>" + "<br />" +
+											"<span>" + commentText + "</span><br />"+
+										"</div>";
+								}
+							}
+							wallString +=
+								"</div>";
+							wall.setHTML(wallString);
+							vpwall.add(wall);
+							final TextBox commentBox = new TextBox();
+							commentBox.setText("Write a comment...");
+							commentBox.addClickListener(new ClickListener() {
+								public void onClick(Widget sender) {
+									commentBox.setText("");
+									
+								}
+							});
+							commentBox.addBlurHandler(new BlurHandler() {
+								public void onBlur(BlurEvent event) {
+									if (commentBox.getText().equals("")) {
+										commentBox.setText("Write a comment...");
+									}	
+								}
+							});
+							final Button commentButton = new Button("Comment");
+							commentButton.addClickHandler(new ClickHandler() {
+								public void onClick(ClickEvent event) {
+									addComment(USERNAME, commentBox.getText(), postId, vpwall);
+									
+								}
+							});
+							vpwall.add(commentBox);
+							vpwall.add(commentButton);
 						}
-						wall.setHTML(wallString);
-						
 					}
 				});
 	}
@@ -266,7 +307,7 @@ public class ProfilePanel {
 				});
 	}
 	
-	private void addPost(final String username, String friendUserName, String text, final HTML wall, final VerticalPanel vpwall) {
+	private void addPost(final String username, String friendUserName, String text, final VerticalPanel vpwall) {
 		parent.getDatabaseService().addPost(friendUserName, username, text,
 				new AsyncCallback<Boolean>() {
 					public void onFailure(Throwable caught) {
@@ -275,6 +316,20 @@ public class ProfilePanel {
 					public void onSuccess(Boolean results) {
 						// parent.popupBox("POST", "you posted successfully");
 						displayWall(username, vpwall);
+					}
+				});
+	}
+	
+
+	private void addComment(String username, final String text, String postId, final VerticalPanel vpwall) {
+		parent.getDatabaseService().addComment(username, text, postId,
+				new AsyncCallback<Boolean>() {
+					public void onFailure(Throwable caught) {
+						parent.popupBox("RPC failure", "getWall");
+					}
+					public void onSuccess(Boolean results) {
+						parent.popupBox("COMMENT", "you commented " + text + " successfully");
+						displayWall(friendUserName, vpwall);
 					}
 				});
 	}

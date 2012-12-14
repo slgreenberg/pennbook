@@ -540,7 +540,7 @@ public class DatabaseImpl extends RemoteServiceServlet implements Database {
 				ret[5] = a.getValue();
 			} 
 		}
-		List<Item> l = db.select(new SelectRequest("select interest from users" +
+		List<Item> l = db.select(new SelectRequest("select interests from users" +
 				" where itemName = '"+username+"'")).getItems();
 		for (Item i : l) {
 			for (Attribute a : i.getAttributes()) {

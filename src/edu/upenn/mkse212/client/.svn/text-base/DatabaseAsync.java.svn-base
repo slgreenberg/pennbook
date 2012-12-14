@@ -71,5 +71,8 @@ public interface DatabaseAsync {
 	void isFriend(String username, String otherUsername, 
 			AsyncCallback<Boolean> callback) throws IllegalArgumentException;
 	
+	void getFriendsList(String username, AsyncCallback<Set<String>> callback) 
+			throws IllegalArgumentException;
+	
 
 }

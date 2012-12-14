@@ -1,10 +1,12 @@
 package edu.upenn.mkse212.client;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.dom.client.Text;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -17,6 +19,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -31,7 +34,6 @@ public class ProfilePanel {
 	Map<String, String>usernameToName;
 	String friendUserName;
 	String USERNAME;
-	Button addFriendButton;
 	
 	public ProfilePanel(PennBook theParent) {
 		this.parent = theParent;
@@ -71,7 +73,7 @@ public class ProfilePanel {
 								public void onSuccess(Boolean success) {
 									updateInfoBox.hide();
 									displayProfileInfo(USERNAME, info);
-									displayWall(USERNAME, vpwall, info, addFriendButton);
+									displayWall(USERNAME, vpwall, info);
 								}
 					});
 				}
@@ -95,15 +97,11 @@ public class ProfilePanel {
 						updateInfoBox.show();
 					}
 				});	
-	    final Button feed = new Button("FEED", new ClickHandler() {
-	    	public void onClick(ClickEvent sender) {
-	    		displayFeed(USERNAME);
-	    	}
-	    });
+	    final Button feed = new Button("THEFEED");
 	    final Button profile = new Button("MY PROFILE", new ClickHandler() {
 	    	public void onClick(ClickEvent sender) {
 	    		displayProfileInfo(USERNAME, info);
-	    		displayWall(USERNAME, vpwall, info, addFriendButton);
+	    		displayWall(USERNAME, vpwall, info);
 	    	}
 	    });
 	    final Button signout = new Button("SIGN OUT", new ClickHandler() {
@@ -128,14 +126,14 @@ public class ProfilePanel {
 				if (nameToUsername.containsKey(input)) {
 					String username = nameToUsername.get(input);
 					displayProfileInfo(username, info);
-					displayWall(username, vpwall, info, addFriendButton);
+					displayWall(username, vpwall, info);
 				}
 				else if (nameToUsername.containsValue(input)) {
 					displayProfileInfo(input, info);
-					displayWall(input, vpwall, info, addFriendButton);
+					displayWall(input, vpwall, info);
 				}
 				else {
-					parent.popupBox("Sorry", "The user you searched does not exist");
+					parent.popupBox("Sorry", "Either you are not friends with the user you searched, or the user does not exist");
 				}
 				
 			}
@@ -143,11 +141,6 @@ public class ProfilePanel {
 	    
 	    buttonPanel.add(searchButton);
 	    p.insertNorth(buttonPanel, 5, null);
-	    
-	    VerticalPanel onlineFriends = new VerticalPanel();
-	    p.insertEast(onlineFriends, 10, null);
-	    
-	    displayOnlineFriends(onlineFriends);
 	    
 	    
 		RootPanel.get("rootPanelContainer").clear();
@@ -164,7 +157,7 @@ public class ProfilePanel {
 		});
 		
 		
-		addFriendButton = new Button("HELL YEAH, I WANA BE FRIENDS!");
+		final Button addFriendButton = new Button("HELL YEAH, I WANA BE FRIENDS!");
 		addFriendButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				addFriend(USERNAME, friendUserName, addFriendButton);
@@ -178,28 +171,11 @@ public class ProfilePanel {
 	 	p.add(vpwall);
 			
 		displayProfileInfo(USERNAME, info);
-		displayWall(USERNAME, vpwall, info, addFriendButton);
+		displayWall(USERNAME, vpwall, info);
 
 
 	}
 		
-	public void displayOnlineFriends(VerticalPanel onlineFriends) {
-		parent.getDatabaseService().getOnline(USERNAME,
-				new AsyncCallback<List<String>>() {
-					public void onFailure(Throwable caught) {
-						parent.popupBox("RPC failure", "getOnline");
-					}
-					public void onSuccess(List<String> results) {
-						HTML friends = new HTML();
-						String html = "";
-						for (String result : results) {
-							html += result + "<br />";
-						}
-						friends.setHTML(html);
-					}
-				});
-		
-	}
 /*
 	private void updateOracle(final MultiWordSuggestOracle oracle) {
 		parent.getDatabaseService().getSuggestions(username,
@@ -237,28 +213,7 @@ public class ProfilePanel {
 					});
 	}
 	
-	public void displayWall(final String username, final VerticalPanel vpwall, final HTML info, final Button addFriendButton) {
-		parent.getDatabaseService().isFriend(USERNAME, username,
-				new AsyncCallback<Boolean>() {
-					public void onFailure(Throwable caught) {
-						parent.popupBox("RPC failure", "isFriend");
-					}
-					@Override
-					public void onSuccess(Boolean result) {
-						if (result) {
-							reallyDisplayWall(username, vpwall, info);
-						} else {
-							vpwall.add(addFriendButton);
-						}
-						
-					}
-
-		});
-	}
-		
-		
-		
-	public void reallyDisplayWall(String username, final VerticalPanel vpwall, final HTML info) {	
+	public void displayWall(String username, final VerticalPanel vpwall, final HTML info) {
 		parent.getDatabaseService().getWall(username,
 				new AsyncCallback<List<List<String>>>() {
 					public void onFailure(Throwable caught) {
@@ -284,40 +239,37 @@ public class ProfilePanel {
 							String wallString = "";
 							HTML wall = new HTML();
 							final String postId = result.get(0);
-							System.out.println(postId);
 							Date date = new Date(System.currentTimeMillis());
 							String time = date.toString();
 							final String postedBy = result.get(1);
 							String post = result.get(2);
 							String commentString = result.get(3);
+<<<<<<< .mine
+
+=======
 							final Anchor poster = new Anchor(usernameToName.get(postedBy));
 							System.out.println(usernameToName.get(postedBy));
 							poster.addClickHandler(new ClickHandler() {
 								public void onClick(ClickEvent event) {
 									displayProfileInfo(postedBy, info);
-									displayWall(postedBy, vpwall, info, addFriendButton);
+									displayWall(postedBy, vpwall, info);
 								}
 							});
+							vpwall.add(poster);
+>>>>>>> .r1873
 							wallString +=
-									"<br /><strong>" + poster + "</strong><br />" +
+									"<br />" +
 									"<i>" + time + "</i><br />" +
 									"<span>" + post + "</span><br />";
 							if (!commentString.equals("")) {
 								String[] comments = commentString.split("~~");
 								for (String comment : comments) {
 									String[] commentFeatures = comment.split("~");
-									final String commenter = commentFeatures[0];
+									String commenter = commentFeatures[0];
 									String commentText = commentFeatures[1];
-									final Anchor posterCommenter = new Anchor(usernameToName.get(commenter));
-									posterCommenter.addClickHandler(new ClickHandler() {
-										public void onClick(ClickEvent event) {
-											displayProfileInfo(commenter, info);
-											displayWall(commenter, vpwall, info, addFriendButton);
-										}
-									});
 									wallString +=
 										"<div style='margin-left:15px'>" +
-											"<strong>" + posterCommenter + "</strong>" + "<br />" +
+											"<strong>" + commenter + "</strong>" + "<br />" +
 											"<span>" + commentText + "</span><br />"+
 										"</div>";
 								}
@@ -401,7 +353,7 @@ public class ProfilePanel {
 					}
 					public void onSuccess(Boolean results) {
 						// parent.popupBox("POST", "you posted successfully");
-						displayWall(username, vpwall, info, addFriendButton);
+						displayWall(username, vpwall, info);
 					}
 				});
 	}
@@ -414,14 +366,8 @@ public class ProfilePanel {
 						parent.popupBox("RPC failure", "addComment");
 					}
 					public void onSuccess(Boolean results) {
-						displayWall(friendUserName, vpwall, info, addFriendButton);
+						displayWall(friendUserName, vpwall, info);
 					}
 				});
 	}
-	
-	private void displayFeed(String username) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }
